@@ -1,0 +1,40 @@
+@go.Package { name = "github.com/zerodoctor/shawarma/pkg/config" }
+module zerodoctor.shawarma.pkg.config
+
+import "package://pkg.pkl-lang.org/pkl-go/pkl.golang@0.5.3#/go.pkl" 
+
+typealias Action = "continue" | "pause" | "stop"
+
+class TimeEvent {
+    deadline: Duration
+    after: String
+    action: Action
+    webhook: String
+}
+
+class ResultEvent {
+    action: Action
+    webhook: String
+}
+
+class Step {
+    name: String
+    command: Listing<String>
+    environment: Map<String, String>
+    privileged: Boolean
+    detach: Boolean
+    on_branch: String
+    on_failure: Listing<ResultEvent>
+    on_success: Listing<ResultEvent>
+    on_time: Listing<TimeEvent>
+}
+
+class Pipeline {
+    type: String
+    environment: Map<String, String>
+    steps: Listing<Step>
+    on_branch: String
+    on_failure: Listing<ResultEvent>
+    on_success: Listing<ResultEvent>
+    on_time: Listing<TimeEvent>
+}
