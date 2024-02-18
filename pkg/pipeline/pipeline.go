@@ -13,7 +13,7 @@ func Run(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Printf("%+v\n", conf.Pipeline.Type)
+	fmt.Printf("%+v\n", conf.Pipeline)
 
 	return nil
 }

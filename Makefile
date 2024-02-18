@@ -1,10 +1,15 @@
 
+.PHONY: generate
+generate:
+	@echo generate...
+	pkl-gen-go template.pkl
+
 .PHONY: build
 build:
 	@echo building...
-	pkl-gen-go template.pkl
 	go build -o shawarma ./cmd/main.go
 
 .PHONY: run
 run:
+	@echo running...
 	./shawarma

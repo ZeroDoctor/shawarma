@@ -1,6 +1,7 @@
-import "template.pkl"
+import "../shawarma.pkl"
 
-pipeline {
+
+pipeline = new template.Pipeline {
     type = "amd64"
 
     steps {

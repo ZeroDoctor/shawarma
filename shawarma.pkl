@@ -38,5 +38,3 @@ class Pipeline {
     on_success: Listing<ResultEvent>
     on_time: Listing<TimeEvent>
 }
-
-pipeline: Pipeline = new {}
