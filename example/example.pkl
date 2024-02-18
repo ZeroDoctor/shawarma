@@ -1,0 +1,9 @@
+import "template.pkl"
+
+pipeline {
+    type = "amd64"
+
+    steps {
+
+    }
+}

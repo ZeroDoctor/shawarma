@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	Pipeline *Pipeline `pkl:"pipeline"`
 }
 
 // LoadFromPath loads the pkl module at the given path and evaluates it into a Config

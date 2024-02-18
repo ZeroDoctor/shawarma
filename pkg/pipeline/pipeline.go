@@ -1,9 +1,19 @@
 package pipeline
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/zerodoctor/shawarma/pkg/config"
 )
 
-func run(pipe config.Pipeline) {
+func Run(ctx context.Context) error {
+	conf, err := config.LoadFromPath(ctx, "./example/example.pkl")
+	if err != nil {
+		return err
+	}
 
+	fmt.Printf("%+v\n", conf.Pipeline.Type)
+
+	return nil
 }
