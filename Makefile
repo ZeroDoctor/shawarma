@@ -2,7 +2,7 @@
 .PHONY: generate
 generate:
 	@echo generate...
-	pkl-gen-go template.pkl
+	pkl-gen-go shawarma.pkl
 
 .PHONY: build
 build:

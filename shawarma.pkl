@@ -18,8 +18,9 @@ class ResultEvent {
 }
 
 class Step {
-    name: String
-    command: Listing<String>
+    name: String = "default"
+    image: String = ""
+    commands: Listing<String>
     environment: Map<String, String>
     privileged: Boolean = false
     detach: Boolean = false
@@ -38,3 +39,5 @@ class Pipeline {
     on_success: Listing<ResultEvent>
     on_time: Listing<TimeEvent>
 }
+
+pipeline: Pipeline = new {}

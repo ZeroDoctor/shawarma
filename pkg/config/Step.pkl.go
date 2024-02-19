@@ -4,7 +4,9 @@ package config
 type Step struct {
 	Name string `pkl:"name"`
 
-	Command []string `pkl:"command"`
+	Image string `pkl:"image"`
+
+	Commands []string `pkl:"commands"`
 
 	Environment map[string]string `pkl:"environment"`
 

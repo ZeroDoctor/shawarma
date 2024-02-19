@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 500,
+            "driver": "SQLite",
+            "name": "data",
+            "database": "/home/zerodoc/Documents/lang/go/zddashboard/data.db"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "shawarma",
+            "database": "${workspaceFolder:shawarma}/shawarma.db"
+        }
+    ]
+}
