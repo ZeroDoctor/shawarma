@@ -7,8 +7,8 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/config"
 )
 
-func Run(ctx context.Context) error {
-	conf, err := config.LoadFromPath(ctx, "./example/example.pkl")
+func Run(ctx context.Context, path string) error {
+	conf, err := config.LoadFromPath(ctx, path)
 	if err != nil {
 		return err
 	}

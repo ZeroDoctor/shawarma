@@ -13,7 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := pipeline.Run(context.Background()); err != nil {
+	if err := pipeline.Run(context.Background(), "./example/example.pkl"); err != nil {
 		panic(err)
 	}
 }

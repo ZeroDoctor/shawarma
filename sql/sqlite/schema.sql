@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS organizations (
+    id          INT,
+    "owner"     TEXT,
+    "name"      TEXT,
+    created_at  INT,
+    modified_at INT,
+
+    PRIMARY KEY("owner", "name")
+);
+
 CREATE TABLE IF NOT EXISTS repositories (
     id          INT,
     "owner"     TEXT,
@@ -22,7 +32,7 @@ CREATE TABLE IF NOT EXISTS branches (
 );
 
 CREATE TABLE IF NOT EXISTS commits (
-    "commit"   TEXT PRIMARY KEY,
+    "hash"   TEXT PRIMARY KEY,
     author     TEXT,
     created_at INT,
 
@@ -46,7 +56,7 @@ CREATE TABLE IF NOT EXISTS runners (
 CREATE TABLE IF NOT EXISTS pipelines (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     "type"      TEXT,
-    repo        TEXT,
+    "status"    TEXT,
     created_at  INT,
     modified_at INT,
 
@@ -60,8 +70,8 @@ CREATE TABLE IF NOT EXISTS steps (
     "name"      TEXT,
     "image"     TEXT,
     commands    TEXT,
-    privileged  INT8,
-    detach      INT8,
+    privileged  INT2,
+    detach      INT2,
     created_at  INT,
     modified_at INT,
 
@@ -74,15 +84,16 @@ CREATE TABLE IF NOT EXISTS steps (
 CREATE TABLE IF NOT EXISTS environments (
     "key"       TEXT,
     "data"      TEXT,
+    protected   INT2,
     created_at  INT,
     modified_at INT,
 
     repo_id     INT,
-    pipeline_id INT,
+    org_id      INT,
 
     FOREIGN KEY (repo_id) REFERENCES repositories(id),
-    FOREIGN KEY (pipeline_id) REFERENCES pipelines(id),
-    PRIMARY KEY("key", repo_id, pipeline_id)
+    FOREIGN KEY (org_id) REFERENCES organizations(id),
+    PRIMARY KEY("key", repo_id, org_id)
 );
 
 CREATE TABLE IF NOT EXISTS events (

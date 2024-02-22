@@ -5,6 +5,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const SQLITE_SCHEMA = "./sql/sqlite/schema.sql"
+
 type SqliteDB struct {
 	db *sqlx.DB
 }
@@ -12,7 +14,7 @@ type SqliteDB struct {
 func NewSqliteDB() (*SqliteDB, error) {
 	db, err := sqlx.Connect("sqlite3", "shawarma.db")
 
-	if err := LoadSchemaFromFile(db, "./sql/sqlite/tables.sql"); err != nil {
+	if err := LoadSchemaFromFile(db, SQLITE_SCHEMA); err != nil {
 		return nil, err
 	}
 

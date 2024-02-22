@@ -7,6 +7,7 @@ import (
 )
 
 type DB interface {
+	InsertPipeline() error
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {
