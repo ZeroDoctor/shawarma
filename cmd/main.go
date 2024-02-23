@@ -8,7 +8,9 @@ import (
 )
 
 func main() {
-	_, err := db.NewSqliteDB()
+	ctx := context.Background()
+
+	_, err := db.NewSqliteDB(ctx)
 	if err != nil {
 		panic(err)
 	}

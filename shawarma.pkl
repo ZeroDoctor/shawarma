@@ -12,21 +12,21 @@ class TimeEvent {
     webhook: String = ""
 }
 
-class ResultEvent {
+class StatusEvent {
     action: Action
     webhook: String = ""
 }
 
 class Step {
-    name: String = "default"
+    name: String
     image: String = ""
     commands: Listing<String>
     environment: Map<String, String>
     privileged: Boolean = false
     detach: Boolean = false
     on_branch: String = ""
-    on_failure: Listing<ResultEvent>
-    on_success: Listing<ResultEvent>
+    on_failure: Listing<StatusEvent>
+    on_success: Listing<StatusEvent>
     on_time: Listing<TimeEvent>
 }
 
@@ -35,8 +35,8 @@ class Pipeline {
     environment: Map<String, String>
     steps: Listing<Step>
     on_branch: String = ""
-    on_failure: Listing<ResultEvent>
-    on_success: Listing<ResultEvent>
+    on_failure: Listing<StatusEvent>
+    on_success: Listing<StatusEvent>
     on_time: Listing<TimeEvent>
 }
 
