@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 
-	"github.com/zerodoctor/shawarma/internal/db"
+	"github.com/zerodoctor/shawarma/internal/db/sqlite"
 	"github.com/zerodoctor/shawarma/pkg/pipeline"
 )
 
 func main() {
 	ctx := context.Background()
 
-	_, err := db.NewSqliteDB(ctx)
+	_, err := sqlite.NewDB(ctx)
 	if err != nil {
 		panic(err)
 	}

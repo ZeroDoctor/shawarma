@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS repositories (
     created_at  INT,
     modified_at INT,
 
+    org_id      TEXT,
+
+    FOREIGN KEY(org_id) REFERENCES organizations(uuid),
     PRIMARY KEY("owner", "name")
 );
 

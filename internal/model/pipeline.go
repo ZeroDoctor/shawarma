@@ -28,6 +28,9 @@ type Pipeline struct {
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
+	RepoID   uuid.UUID `db:"repo_id"`
+	RunnerID uuid.UUID `db:"runner_id"`
+
 	Steps  []Step
 	Events []Event
 	Repo   Repository
@@ -37,14 +40,13 @@ type Step struct {
 	UUID       uuid.UUID `db:"uuid"`
 	Name       string    `db:"name"`
 	Image      string    `db:"image"`
-	Commands   []string  `db:"commands"`
+	Commands   []string  `db:"commands"` // TODO: create type alias []string for db
 	Privileged bool      `db:"privileged"`
 	Detach     bool      `db:"detach"`
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
-	PipelineID int    `db:"pipeline_id"`
-	RunnerID   string `db:"runner_id"`
+	PipelineID int `db:"pipeline_id"`
 
 	Events []Event
 }
@@ -56,8 +58,8 @@ type Environment struct {
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
-	RepoID string `db:"repo_id"`
-	OrgID  string `db:"org_id"`
+	RepoID uuid.UUID `db:"repo_id"`
+	OrgID  uuid.UUID `db:"org_id"`
 }
 
 type Event struct {
@@ -68,6 +70,6 @@ type Event struct {
 	CreatedAt  time.Time   `db:"created_at"`
 	ModifiedAt time.Time   `db:"modified_at"`
 
-	PipelineID int    `db:"pipeline_id"`
-	StepID     string `db:"step_id"`
+	PipelineID int       `db:"pipeline_id"`
+	StepID     uuid.UUID `db:"step_id"`
 }

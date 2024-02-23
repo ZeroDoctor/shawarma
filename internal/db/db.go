@@ -19,9 +19,12 @@ type DB interface {
 	InsertRepository(model.Repository) (model.Repository, error)
 	InsertBranch(model.Branch) (model.Branch, error)
 	InsertCommit(model.Commit) (model.Commit, error)
+	InsertRunner(model.Runner) (model.Runner, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {
+	log.Debugf("loading schema [file=%s]...", path)
+
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
