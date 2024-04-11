@@ -5,6 +5,8 @@ import (
 	"github.com/zerodoctor/shawarma/internal/model"
 )
 
+// TODO: use transaction when possible
+
 func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, error) {
 	insert := `INSERT INTO pipelines (
 		"type", "status", 

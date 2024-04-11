@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS pipelines (
 );
 
 CREATE TABLE IF NOT EXISTS steps (
-    uuid        TEXT UNIQUE, -- stop... your using sqlite anyways
+    uuid        TEXT UNIQUE,
     "name"      TEXT,
     "image"     TEXT,
     commands    TEXT,
@@ -46,8 +46,10 @@ CREATE TABLE IF NOT EXISTS environments (
 CREATE TABLE IF NOT EXISTS events (
     webhook     TEXT,
     "type"      TEXT,
+    status_name TEXT,
     "action"    TEXT,
     deadline    TEXT,
+    "after"     TEXT,
     created_at  INT,
     modified_at INT,
 

@@ -2,12 +2,14 @@
 .PHONY: generate
 generate:
 	@echo generate...
-	pkl-gen-go shawarma.pkl
+	cd server
+	pkl-gen-go --output-path ./server ./shawarma.pkl
 
 .PHONY: build
 build:
 	@echo building...
-	go build -o shawarma ./cmd/main.go
+	cd server && \
+	go build -o ../shawarma ./cmd/main.go
 
 .PHONY: run
 run:
