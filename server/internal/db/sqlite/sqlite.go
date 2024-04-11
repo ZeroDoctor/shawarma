@@ -9,9 +9,12 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/zerodoctor/shawarma/internal/db"
+	"github.com/zerodoctor/shawarma/internal/logger"
 )
 
-const SQLITE_SCHEMA_DIR = "./sql/sqlite"
+var log = logger.Log
+
+const SQLITE_SCHEMA_DIR = "./server/sql/sqlite"
 
 type SqliteDB struct {
 	conn *sqlx.DB
@@ -19,6 +22,7 @@ type SqliteDB struct {
 }
 
 func NewDB(ctx context.Context) (*SqliteDB, error) {
+	log.Info("connecting to sqlite db...")
 	conn, err := sqlx.ConnectContext(ctx, "sqlite3", "shawarma.db")
 	if err != nil {
 		return nil, err
@@ -33,7 +37,7 @@ func NewDB(ctx context.Context) (*SqliteDB, error) {
 			return nil
 		}
 
-		return db.LoadSchemaFromFile(conn, SQLITE_SCHEMA_DIR+"/"+path)
+		return db.LoadSchemaFromFile(conn, path)
 	})
 
 	return &SqliteDB{conn: conn, ctx: ctx}, err

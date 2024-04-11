@@ -7,6 +7,6 @@ func init() {
 	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config", Config{})
 	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config#Pipeline", Pipeline{})
 	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config#Step", Step{})
-	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config#ResultEvent", ResultEvent{})
+	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config#StatusEvent", StatusEvent{})
 	pkl.RegisterMapping("zerodoctor.shawarma.pkg.config#TimeEvent", TimeEvent{})
 }

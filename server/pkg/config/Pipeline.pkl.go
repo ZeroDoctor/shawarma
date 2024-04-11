@@ -10,9 +10,9 @@ type Pipeline struct {
 
 	OnBranch string `pkl:"on_branch"`
 
-	OnFailure []*ResultEvent `pkl:"on_failure"`
+	OnFailure []*StatusEvent `pkl:"on_failure"`
 
-	OnSuccess []*ResultEvent `pkl:"on_success"`
+	OnSuccess []*StatusEvent `pkl:"on_success"`
 
 	OnTime []*TimeEvent `pkl:"on_time"`
 }
