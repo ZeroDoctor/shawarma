@@ -2,8 +2,8 @@
 .PHONY: generate
 generate:
 	@echo generate...
-	cd server
-	pkl-gen-go --output-path ./server ./shawarma.pkl
+	cd server && \
+	pkl-gen-go ../shawarma.pkl
 
 .PHONY: build
 build:

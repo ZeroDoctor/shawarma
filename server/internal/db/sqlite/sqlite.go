@@ -22,6 +22,7 @@ type SqliteDB struct {
 }
 
 func NewDB(ctx context.Context) (*SqliteDB, error) {
+	log.Info("connecting to sqlite db...")
 	conn, err := sqlx.ConnectContext(ctx, "sqlite3", "shawarma.db")
 	if err != nil {
 		return nil, err
