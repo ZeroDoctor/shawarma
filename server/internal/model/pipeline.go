@@ -2,12 +2,18 @@ package model
 
 import (
 	"database/sql/driver"
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type PipelineStatus string
+
+const (
+	CREATED PipelineStatus = "created"
+)
 
 func (ps *PipelineStatus) Scan(value interface{}) error {
 	str, _ := value.(string)
@@ -20,10 +26,6 @@ func (ps PipelineStatus) Value() (driver.Value, error) {
 	return string(ps), nil
 }
 
-const (
-	CREATED PipelineStatus = "created"
-)
-
 type Action string
 
 const (
@@ -32,12 +34,34 @@ const (
 	STOP     Action = "stop"
 )
 
+func (a *Action) Scan(value interface{}) error {
+	str, _ := value.(string)
+	*a = Action(str)
+
+	return nil
+}
+
+func (a Action) Value() (driver.Value, error) {
+	return string(a), nil
+}
+
 type StatusEvent string
 
 const (
 	TIME   StatusEvent = "time"
 	STATUS StatusEvent = "status"
 )
+
+func (se *StatusEvent) Scan(value interface{}) error {
+	str, _ := value.(string)
+	*se = StatusEvent(str)
+
+	return nil
+}
+
+func (se StatusEvent) Value() (driver.Value, error) {
+	return string(se), nil
+}
 
 type StatusEventName string
 
@@ -46,6 +70,33 @@ const (
 	FAILURE StatusEventName = "failure"
 	SUCCESS StatusEventName = "success"
 )
+
+func (sen *StatusEventName) Scan(value interface{}) error {
+	str, _ := value.(string)
+	*sen = StatusEventName(str)
+
+	return nil
+}
+
+func (sen StatusEventName) Value() (driver.Value, error) {
+	return string(sen), nil
+}
+
+type Commands []string
+
+func (c *Commands) Scan(value interface{}) error {
+	str, ok := value.(string)
+	if !ok {
+		return errors.New("commands is not a string")
+	}
+	*c = strings.Split(str, ",")
+
+	return nil
+}
+
+func (c Commands) Value() (driver.Value, error) {
+	return strings.Join(c, ","), nil
+}
 
 type Pipeline struct {
 	ID         int            `db:"id"`
@@ -65,7 +116,7 @@ type Step struct {
 	UUID       uuid.UUID `db:"uuid"`
 	Name       string    `db:"name"`
 	Image      string    `db:"image"`
-	Commands   []string  `db:"commands"` // TODO: create type alias []string for db
+	Commands   Commands  `db:"commands"`
 	Privileged bool      `db:"privileged"`
 	Detach     bool      `db:"detach"`
 	CreatedAt  time.Time `db:"created_at"`

@@ -27,7 +27,11 @@ func (api *API) controllerV1(router *gin.RouterGroup) {
 
 	router.POST("/event/branch", api.branchUpdateEvent)
 
-	router.POST("/webhook", api.webhook)
+	router.POST("/pipeline/webhook", api.webhookPipeline)
+
+	// NOTE: private apis
+
+	router.PUT("/internal/pipeline/status", api.setPipelineStatus)
 }
 
 func internalError(ctx *gin.Context, err error) {
