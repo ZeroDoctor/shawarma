@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -102,8 +101,8 @@ type Pipeline struct {
 	ID         int            `db:"id"`
 	Type       string         `db:"type"`
 	Status     PipelineStatus `db:"status"`
-	CreatedAt  time.Time      `db:"created_at"`
-	ModifiedAt time.Time      `db:"modified_at"`
+	CreatedAt  Time           `db:"created_at"`
+	ModifiedAt Time           `db:"modified_at"`
 
 	RepoID   uuid.UUID `db:"repo_id"`
 	RunnerID uuid.UUID `db:"runner_id"`
@@ -119,8 +118,8 @@ type Step struct {
 	Commands   Commands  `db:"commands"`
 	Privileged bool      `db:"privileged"`
 	Detach     bool      `db:"detach"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	CreatedAt  Time      `db:"created_at"`
+	ModifiedAt Time      `db:"modified_at"`
 
 	PipelineID int `db:"pipeline_id"`
 
@@ -128,11 +127,11 @@ type Step struct {
 }
 
 type Environment struct {
-	Key        string    `db:"key"`
-	Data       string    `db:"data"`
-	Protected  bool      `db:"protected"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	Key        string `db:"key"`
+	Data       string `db:"data"`
+	Protected  bool   `db:"protected"`
+	CreatedAt  Time   `db:"created_at"`
+	ModifiedAt Time   `db:"modified_at"`
 
 	RepoID uuid.UUID `db:"repo_id"`
 	OrgID  uuid.UUID `db:"org_id"`
@@ -145,8 +144,8 @@ type Event struct {
 	Action     Action          `db:"action"`
 	Deadline   string          `db:"deadline"`
 	After      string          `db:"after"`
-	CreatedAt  time.Time       `db:"created_at"`
-	ModifiedAt time.Time       `db:"modified_at"`
+	CreatedAt  Time            `db:"created_at"`
+	ModifiedAt Time            `db:"modified_at"`
 
 	PipelineID int       `db:"pipeline_id"`
 	StepID     uuid.UUID `db:"step_id"`

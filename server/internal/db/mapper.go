@@ -33,8 +33,8 @@ func NewPipeline(repoID string, runnerID string, pipe config.Pipeline) model.Pip
 	return model.Pipeline{
 		Type:       pipe.Type,
 		Status:     model.CREATED,
-		CreatedAt:  now,
-		ModifiedAt: now,
+		CreatedAt:  model.Time(now),
+		ModifiedAt: model.Time(now),
 		RepoID:     uuid.MustParse(repoID),
 		RunnerID:   uuid.MustParse(runnerID),
 		Steps:      steps,
@@ -66,8 +66,8 @@ func NewStep(pipelineID int, step config.Step) model.Step {
 		Commands:   step.Commands,
 		Privileged: step.Privileged,
 		Detach:     step.Detach,
-		CreatedAt:  now,
-		ModifiedAt: now,
+		CreatedAt:  model.Time(now),
+		ModifiedAt: model.Time(now),
 
 		PipelineID: pipelineID,
 	}
@@ -85,8 +85,8 @@ func newEvent[T config.StatusEvent | config.TimeEvent](eType model.StatusEvent, 
 	now := time.Now()
 	e := model.Event{
 		Type:       eType,
-		CreatedAt:  now,
-		ModifiedAt: now,
+		CreatedAt:  model.Time(now),
+		ModifiedAt: model.Time(now),
 		StatusName: status,
 	}
 
@@ -102,4 +102,25 @@ func newEvent[T config.StatusEvent | config.TimeEvent](eType model.StatusEvent, 
 	}
 
 	return e
+}
+
+func NewUserFromGithub(githubUser model.GithubUser) (model.User, error) {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return model.User{}, err
+	}
+
+	session, err := uuid.NewV7()
+	if err != nil {
+		return model.User{}, err
+	}
+
+	now := time.Now()
+	return model.User{
+		UUID:        id,
+		Session:     session.String(),
+		GithubToken: githubUser.Token,
+		CreatedAt:   model.Time(now),
+		ModifiedAt:  model.Time(now),
+	}, nil
 }

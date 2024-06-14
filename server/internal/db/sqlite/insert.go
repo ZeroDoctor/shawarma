@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"github.com/google/uuid"
+	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/model"
 )
 
@@ -299,4 +300,28 @@ func (s *SqliteDB) InsertRunner(runner model.Runner) (model.Runner, error) {
 
 	_, err = s.conn.NamedExec(insert, runner)
 	return runner, err
+}
+
+func (s *SqliteDB) InsertGithubUser(githubUser model.GithubUser) (model.User, error) {
+	user, err := db.NewUserFromGithub(githubUser)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	insert := `INSERT INTO users (
+		uuid, "name", github_token,
+		"session", created_at, modified_at
+	) VALUES (
+		:uuid, :name, :github_token,
+		:session, :created_at, :modified_at
+	) ON CONFLICT("name", "session") DO UPDATE SET
+		uuid         = excluded.uuid, 
+		github_token = excluded.github_token,
+		session      = excluded.session,
+		created_at   = excluded.created_at, 
+		modified_at  = excluded.modified_at
+	;`
+
+	_, err = s.conn.NamedExec(insert, user)
+	return user, err
 }

@@ -20,6 +20,7 @@ type DB interface {
 	InsertBranch(model.Branch) (model.Branch, error)
 	InsertCommit(model.Commit) (model.Commit, error)
 	InsertRunner(model.Runner) (model.Runner, error)
+	InsertGithubUser(model.GithubUser) (model.User, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {

@@ -8,11 +8,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
 )
 
-var log = logger.Log
+var log *logrus.Logger = logger.Log
 
 const SQLITE_SCHEMA_DIR = "./server/sql/sqlite"
 
