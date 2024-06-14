@@ -5,23 +5,34 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
+	"github.com/zerodoctor/shawarma/internal/logger"
 )
+
+var log *logrus.Logger = logger.Log
 
 type API struct {
 	db db.DB
 }
 
-func (api *API) Run(ctx context.Context, address ...string) {
+func NewAPI(db db.DB) *API {
+	return &API{
+		db: db,
+	}
+}
+
+func (api *API) Run(ctx context.Context, address ...string) error {
 	engine := gin.New()
 
 	router := engine.Group("/v1")
 	api.controllerV1(router)
 
-	engine.Run(address...)
+	return engine.Run(address...)
 }
 
 func (api *API) controllerV1(router *gin.RouterGroup) {
+	router.POST("/register/github/user", api.registerGithubUser)
 	router.POST("/register/org", api.registerOrganization)
 	router.POST("/register/runner", api.registerRunner)
 
