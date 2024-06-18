@@ -44,7 +44,9 @@ func GetGithubToken(user model.User) (string, error) {
 	return tokenResponse.AccessToken, nil
 }
 
-func GetGithubAuthUser(token string, user model.GithubAuthUser) (model.GithubAuthUser, error) {
+func GetGithubAuthUser(token string) (model.GithubUser, error) {
+	var user model.GithubUser
+
 	resp, err := NewRequest(HTTP_GET, GITHUB_AUTH_USER_URL).
 		OptionGithubHeaders(token).
 		Do()
@@ -53,12 +55,15 @@ func GetGithubAuthUser(token string, user model.GithubAuthUser) (model.GithubAut
 	}
 	defer resp.Body.Close()
 
-	// TODO: figure out how to store data
-	_, err = io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return user, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
 			GITHUB_AUTH_USER_URL, err,
 		)
+	}
+
+	if err := json.Unmarshal(data, &user); err != nil {
+		return user, fmt.Errorf("failed to unmarshal data for github auth user [error=%w]", err)
 	}
 
 	return user, nil

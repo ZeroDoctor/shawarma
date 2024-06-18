@@ -301,7 +301,7 @@ func (s *SqliteDB) InsertRunner(runner model.Runner) (model.Runner, error) {
 	return runner, err
 }
 
-func (s *SqliteDB) InsertGithubUser(user model.User) (model.User, error) {
+func (s *SqliteDB) InsertUser(user model.User) (model.User, error) {
 	var err error
 
 	insert := `INSERT INTO users (

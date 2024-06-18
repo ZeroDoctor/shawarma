@@ -104,7 +104,7 @@ func newEvent[T config.StatusEvent | config.TimeEvent](eType model.StatusEvent, 
 	return e
 }
 
-func NewUserFromGithub(token string, githubUser model.GithubAuthUser) (model.User, error) {
+func NewUserFromGithub(token string, githubUser model.GithubUser) (model.User, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return model.User{}, err

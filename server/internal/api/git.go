@@ -24,7 +24,15 @@ func (api *API) registerGithubUser(ctx *gin.Context) {
 	}
 	user.GithubToken = token
 
-	user, err = api.db.InsertGithubUser(user)
+	githubUser, err := service.GetGithubAuthUser(token)
+	if err != nil {
+		log.Errorf("failed to fetch github user [error=%s]", err.Error())
+		internalError(ctx, err)
+		return
+	}
+	user.GithubUser = githubUser
+
+	user, err = api.db.InsertUser(user)
 	if err != nil {
 		log.Errorf("failed to save user [error=%s]", err.Error())
 		internalError(ctx, err)

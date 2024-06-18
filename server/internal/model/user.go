@@ -11,5 +11,5 @@ type User struct {
 	CreatedAt   Time      `json:"created_at" db:"created_at"`
 	ModifiedAt  Time      `json:"modified_at" db:"modified_at"`
 
-	GithubUser GithubAuthUser
+	GithubUser GithubUser
 }
