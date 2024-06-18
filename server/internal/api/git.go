@@ -9,22 +9,22 @@ import (
 )
 
 func (api *API) registerGithubUser(ctx *gin.Context) {
-	var githubUser model.GithubUser
-	if err := ctx.BindJSON(&githubUser); err != nil {
+	var user model.User
+	if err := ctx.BindJSON(&user); err != nil {
 		log.Warnf("failed to bind json to github user [error=%s]", err.Error())
 		badRequestError(ctx, err)
 		return
 	}
 
-	token, err := service.GetGithubToken(githubUser)
+	token, err := service.GetGithubToken(user)
 	if err != nil {
 		log.Errorf("failed to fetch github token [error=%s]", err.Error())
 		internalError(ctx, err)
 		return
 	}
-	githubUser.Token = token
+	user.GithubToken = token
 
-	user, err := api.db.InsertGithubUser(githubUser)
+	user, err = api.db.InsertGithubUser(user)
 	if err != nil {
 		log.Errorf("failed to save user [error=%s]", err.Error())
 		internalError(ctx, err)

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
-	"net/url"
 
 	"github.com/zerodoctor/shawarma/internal/model"
 )
@@ -17,22 +15,10 @@ const (
 	GITHUB_AUTH_USER_URL string = GITHUB_API_ENDPOINT + "/user"
 )
 
-func GetGithubToken(user model.GithubUser) (string, error) {
-	authURL, err := url.Parse(GITHUB_OAUTH_TOKEN_URL)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse [url=%s] [error=%w]",
-			GITHUB_OAUTH_TOKEN_URL, err,
-		)
-	}
-
-	req, err := http.NewRequest("POST", authURL.String(), nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create request for fetching token [error=%w]", err)
-	}
-	req.Header.Add("Accept", "application/json")
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
+func GetGithubToken(user model.User) (string, error) {
+	resp, err := NewRequest(HTTP_POST, GITHUB_OAUTH_TOKEN_URL).
+		OptionGithubHeaders(user.GithubToken).
+		Do()
 	if err != nil {
 		return "", fmt.Errorf("failed to do request [error=%w]", err)
 	}
@@ -53,27 +39,15 @@ func GetGithubToken(user model.GithubUser) (string, error) {
 	}
 
 	log.Debugf("for [state=%s] receive token with [scope=%s]",
-		user.State, tokenResponse.Scope,
+		user.GithubState, tokenResponse.Scope,
 	)
 	return tokenResponse.AccessToken, nil
 }
 
-func GetGithubAuthUser(user model.GithubUser) (model.GithubUser, error) {
-	userURL, err := url.Parse(GITHUB_AUTH_USER_URL)
-	if err != nil {
-		return user, fmt.Errorf("failed to parse [url=%s] [error=%w]",
-			GITHUB_AUTH_USER_URL, err,
-		)
-	}
-
-	req, err := http.NewRequest("GET", userURL.String(), nil)
-	if err != nil {
-		return user, fmt.Errorf("failed to create request for auth user [error=%w]", err)
-	}
-	addGithubHeaders(req, user.Token)
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
+func GetGithubAuthUser(token string, user model.GithubAuthUser) (model.GithubAuthUser, error) {
+	resp, err := NewRequest(HTTP_GET, GITHUB_AUTH_USER_URL).
+		OptionGithubHeaders(token).
+		Do()
 	if err != nil {
 		return user, fmt.Errorf("failed to do request [error=%w]", err)
 	}

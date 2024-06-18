@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"github.com/google/uuid"
-	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/model"
 )
 
@@ -302,11 +301,8 @@ func (s *SqliteDB) InsertRunner(runner model.Runner) (model.Runner, error) {
 	return runner, err
 }
 
-func (s *SqliteDB) InsertGithubUser(githubUser model.GithubUser) (model.User, error) {
-	user, err := db.NewUserFromGithub(githubUser)
-	if err != nil {
-		return model.User{}, err
-	}
+func (s *SqliteDB) InsertGithubUser(user model.User) (model.User, error) {
+	var err error
 
 	insert := `INSERT INTO users (
 		uuid, "name", github_token,
