@@ -8,17 +8,20 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
+	"github.com/zerodoctor/shawarma/internal/service"
 )
 
 var log *logrus.Logger = logger.Log
 
 type API struct {
-	db db.DB
+	db      db.DB
+	service *service.Service
 }
 
 func NewAPI(db db.DB) *API {
 	return &API{
-		db: db,
+		db:      db,
+		service: service.NewService(db),
 	}
 }
 

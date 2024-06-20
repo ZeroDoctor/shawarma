@@ -15,8 +15,30 @@ const (
 	GITHUB_AUTH_USER_URL string = GITHUB_API_ENDPOINT + "/user"
 )
 
-func GetGithubToken(user model.User) (string, error) {
-	resp, err := NewRequest(HTTP_POST, GITHUB_OAUTH_TOKEN_URL).
+func (s *Service) SaveGithubAuthUser(user model.User) (model.User, error) {
+	token, err := s.GetGithubToken(user)
+	if err != nil {
+		return user, fmt.Errorf("failed to fetch github token [error=%w]", err)
+	}
+	user.GithubToken = token
+
+	githubUser, err := s.GetGithubAuthUser(token)
+	if err != nil {
+		return user, fmt.Errorf("failed to fetch github user [error=%w]", err)
+	}
+	user.GithubUser = githubUser
+
+	user, err = s.db.InsertUser(user)
+	if err != nil {
+		return user, fmt.Errorf("failed to save user [error=%w]", err)
+	}
+	user.GithubToken = ""
+
+	return user, nil
+}
+
+func (s *Service) GetGithubToken(user model.User) (string, error) {
+	resp, err := NewRequest(HTTP_POST, GITHUB_OAUTH_TOKEN_URL, nil).
 		OptionGithubHeaders(user.GithubToken).
 		Do()
 	if err != nil {
@@ -44,10 +66,10 @@ func GetGithubToken(user model.User) (string, error) {
 	return tokenResponse.AccessToken, nil
 }
 
-func GetGithubAuthUser(token string) (model.GithubUser, error) {
+func (s *Service) GetGithubAuthUser(token string) (model.GithubUser, error) {
 	var user model.GithubUser
 
-	resp, err := NewRequest(HTTP_GET, GITHUB_AUTH_USER_URL).
+	resp, err := NewRequest(HTTP_GET, GITHUB_AUTH_USER_URL, nil).
 		OptionGithubHeaders(token).
 		Do()
 	if err != nil {
@@ -67,4 +89,8 @@ func GetGithubAuthUser(token string) (model.GithubUser, error) {
 	}
 
 	return user, nil
+}
+
+func (s *Service) GetGithubUserOrg() {
+
 }

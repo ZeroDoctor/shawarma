@@ -2,10 +2,12 @@ package service
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/sirupsen/logrus"
+	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
 )
 
@@ -25,12 +27,22 @@ const (
 	HTTP_DELETE  string = "DELETE"
 )
 
+type Service struct {
+	db db.DB
+}
+
+func NewService(db db.DB) *Service {
+	return &Service{
+		db: db,
+	}
+}
+
 type Request struct {
 	req *http.Request
 	err error
 }
 
-func NewRequest(method, u string) *Request {
+func NewRequest(method, u string, body io.Reader) *Request {
 	uri, err := url.Parse(u)
 	if err != nil {
 		return &Request{
@@ -38,7 +50,7 @@ func NewRequest(method, u string) *Request {
 		}
 	}
 
-	req, err := http.NewRequest(method, uri.String(), nil)
+	req, err := http.NewRequest(method, uri.String(), body)
 	if err != nil {
 		return &Request{err: fmt.Errorf("failed to create request [error=%w]", err)}
 	}

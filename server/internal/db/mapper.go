@@ -103,24 +103,3 @@ func newEvent[T config.StatusEvent | config.TimeEvent](eType model.StatusEvent, 
 
 	return e
 }
-
-func NewUserFromGithub(token string, githubUser model.GithubUser) (model.User, error) {
-	id, err := uuid.NewV7()
-	if err != nil {
-		return model.User{}, err
-	}
-
-	session, err := uuid.NewV7()
-	if err != nil {
-		return model.User{}, err
-	}
-
-	now := time.Now()
-	return model.User{
-		UUID:        id,
-		Session:     session.String(),
-		GithubToken: token,
-		CreatedAt:   model.Time(now),
-		ModifiedAt:  model.Time(now),
-	}, nil
-}

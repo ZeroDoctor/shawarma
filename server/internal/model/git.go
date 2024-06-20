@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -10,8 +8,8 @@ type Organization struct {
 	UUID       uuid.UUID `db:"uuid"`
 	Owner      string    `db:"owner" json:"owner"`
 	Name       string    `db:"name" json:"name"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	CreatedAt  Time      `db:"created_at"`
+	ModifiedAt Time      `db:"modified_at"`
 
 	Repositories []Repository  `json:"repository"`
 	Environments []Environment `json:"environments"`

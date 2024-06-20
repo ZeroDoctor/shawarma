@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zerodoctor/shawarma/internal/model"
-	"github.com/zerodoctor/shawarma/internal/service"
 )
 
 func (api *API) registerGithubUser(ctx *gin.Context) {
@@ -16,29 +15,12 @@ func (api *API) registerGithubUser(ctx *gin.Context) {
 		return
 	}
 
-	token, err := service.GetGithubToken(user)
+	var err error
+	user, err = api.service.SaveGithubAuthUser(user)
 	if err != nil {
-		log.Errorf("failed to fetch github token [error=%s]", err.Error())
 		internalError(ctx, err)
 		return
 	}
-	user.GithubToken = token
-
-	githubUser, err := service.GetGithubAuthUser(token)
-	if err != nil {
-		log.Errorf("failed to fetch github user [error=%s]", err.Error())
-		internalError(ctx, err)
-		return
-	}
-	user.GithubUser = githubUser
-
-	user, err = api.db.InsertUser(user)
-	if err != nil {
-		log.Errorf("failed to save user [error=%s]", err.Error())
-		internalError(ctx, err)
-		return
-	}
-	user.GithubToken = ""
 
 	ctx.JSON(http.StatusAccepted, user)
 }
