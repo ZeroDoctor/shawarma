@@ -28,6 +28,24 @@ func (s *Service) SaveGithubAuthUser(user model.User) (model.User, error) {
 	}
 	user.GithubUser = githubUser
 
+	githubUserOrgs, err := s.GetGithubUserOrgs(token, githubUser.OrganizationsURL)
+	if err != nil {
+		return user, fmt.Errorf("failed to fetch github user orgs [error=%w]", err)
+	}
+
+	var githubOrgs []model.GithubOrg
+	for i := range githubUserOrgs {
+		org, err := s.GetGithubOrg(token, githubUserOrgs[i].URL)
+		if err != nil {
+			return user, fmt.Errorf("failed to fetch github [org=%s] [error=%w]",
+				githubUserOrgs[i].Login, err,
+			)
+		}
+		githubOrgs = append(githubOrgs, org)
+	}
+	// TODO: save githubOrgs with github user id
+	//	also insert new row for org with generic values
+
 	user, err = s.db.InsertUser(user)
 	if err != nil {
 		return user, fmt.Errorf("failed to save user [error=%w]", err)
@@ -91,6 +109,52 @@ func (s *Service) GetGithubAuthUser(token string) (model.GithubUser, error) {
 	return user, nil
 }
 
-func (s *Service) GetGithubUserOrg() {
+func (s *Service) GetGithubUserOrgs(token string, userOrgsURL string) ([]model.GithubUserOrg, error) {
+	var userOrgs []model.GithubUserOrg
 
+	resp, err := NewRequest(HTTP_GET, userOrgsURL, nil).
+		OptionGithubHeaders(token).
+		Do()
+	if err != nil {
+		return userOrgs, fmt.Errorf("failed to do request [error=%w]", err)
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return userOrgs, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
+			userOrgsURL, err,
+		)
+	}
+
+	if err := json.Unmarshal(data, &userOrgs); err != nil {
+		return userOrgs, fmt.Errorf("failed to unmarshal data from github user orgs [error=%w]", err)
+	}
+
+	return userOrgs, nil
+}
+
+func (s *Service) GetGithubOrg(token string, orgURL string) (model.GithubOrg, error) {
+	var org model.GithubOrg
+
+	resp, err := NewRequest(HTTP_GET, orgURL, nil).
+		OptionGithubHeaders(token).
+		Do()
+	if err != nil {
+		return org, fmt.Errorf("failed to do request [error=%w]", err)
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return org, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
+			orgURL, err,
+		)
+	}
+
+	if err := json.Unmarshal(data, &org); err != nil {
+		return org, fmt.Errorf("failed to unmarshal data from github org [error=%w]", err)
+	}
+
+	return org, nil
 }

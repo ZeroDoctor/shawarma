@@ -20,7 +20,7 @@ type GithubUser struct {
 	Type                    string         `json:"type,omitempty" db:"type"`
 	SiteAdmin               bool           `json:"site_admin,omitempty"`
 	Name                    string         `json:"name,omitempty" db:"name"`
-	Company                 string         `json:"company,omitempty"`
+	Company                 string         `json:"company,omitempty" db:"company"`
 	Blog                    string         `blog:"blog,omitempty"`
 	Location                string         `json:"location,omitempty"`
 	Email                   string         `json:"email,omitempty"`
@@ -72,19 +72,19 @@ type GithubUserOrg struct {
 
 type GithubOrg struct {
 	Login                   string `json:"login,omitempty"`
-	ID                      int    `json:"id,omitempty"`
+	ID                      int    `json:"id,omitempty" db:"id"`
 	NodeID                  string `json:"node_id,omitempty"`
-	URL                     string `json:"url,omitempty"`
-	ReposURL                string `json:"repos_url,omitempty"`
+	URL                     string `json:"url,omitempty" db:"url"`
+	ReposURL                string `json:"repos_url,omitempty" db:"repos_url"`
 	EventsURL               string `json:"events_url,omitempty"`
-	HooksURL                string `json:"hooks_url,omitempty"`
-	IssuesURL               string `json:"issues_url,omitempty"`
-	MembersURL              string `json:"members_url,omitempty"`
-	PublicMembersURL        string `json:"public_members_url,omitempty"`
-	AvatarURL               string `json:"avatar_url,omitempty"`
-	Description             string `json:"description,omitempty"`
-	Name                    string `json:"name,omitempty"`
-	Company                 string `json:"company,omitempty"`
+	HooksURL                string `json:"hooks_url,omitempty" db:"hooks_url"`
+	IssuesURL               string `json:"issues_url,omitempty" db:"issues_url"`
+	MembersURL              string `json:"members_url,omitempty" db:"members_url"`
+	PublicMembersURL        string `json:"public_members_url,omitempty" db:"public_members_url"`
+	AvatarURL               string `json:"avatar_url,omitempty" db:"avatar_url"`
+	Description             string `json:"description,omitempty" db:"description"`
+	Name                    string `json:"name,omitempty" db:"name"`
+	Company                 string `json:"company,omitempty" db:"company"`
 	Blog                    string `json:"blog,omitempty"`
 	Location                string `json:"location,omitempty"`
 	Email                   string `json:"email,omitempty"`
@@ -97,62 +97,62 @@ type GithubOrg struct {
 	Followers               int    `json:"followers,omitempty"`
 	Following               int    `json:"followings,omitempty"`
 	HtmlURL                 string `json:"html_url,omitempty"`
-	CreatedAt               string `json:"created_at,omitempty"`
-	UpdatedAt               string `json:"updated_at,omitempty"`
-	ArchivedAt              string `json:"archived_at,omitempty"`
-	Type                    string `json:"type,omitempty"`
+	CreatedAt               string `json:"created_at,omitempty" db:"created_at"`
+	UpdatedAt               string `json:"updated_at,omitempty" db:"updated_at"`
+	ArchivedAt              string `json:"archived_at,omitempty" db:"archived_at"`
+	Type                    string `json:"type,omitempty" db:"type"`
 }
 
 type GithubRepos struct {
-	ID                       int        `json:"id,omitempty"`
+	ID                       int        `json:"id,omitempty" db:"id"`
 	NodeID                   string     `json:"node_id,omitempty"`
-	Name                     string     `json:"name,omitempty"`
-	FullName                 string     `json:"full_name,omitempty"`
+	Name                     string     `json:"name,omitempty" db:"name"`
+	FullName                 string     `json:"full_name,omitempty" db:"full_name"`
 	Private                  bool       `json:"private,omitempty"`
 	Owner                    GithubUser `json:"owner,omitempty"`
 	HtmlURL                  string     `json:"html_url,omitempty"`
-	Description              string     `json:"description,omitempty"`
+	Description              string     `json:"description,omitempty" db:"description"`
 	Fork                     bool       `json:"fork,omitempty"`
-	URL                      string     `json:"url,omitempty"`
+	URL                      string     `json:"url,omitempty" db:"url"`
 	ForksURL                 string     `json:"forks_url,omitempty"`
 	KeysURL                  string     `json:"keys_url,omitempty"`
-	CollaboratorsURL         string     `json:"collaborators_url,omitempty"`
+	CollaboratorsURL         string     `json:"collaborators_url,omitempty" db:"collaborators_url"`
 	TeamsURL                 string     `json:"teams_url,omitempty"`
-	HooksURL                 string     `json:"hooks_url,omitempty"`
-	IssueEventsURL           string     `json:"issue_events_url,omitempty"`
+	HooksURL                 string     `json:"hooks_url,omitempty" db:"hooks_url"`
+	IssueEventsURL           string     `json:"issue_events_url,omitempty" db:"issue_events_url"`
 	EventsURL                string     `json:"events_url,omitempty"`
 	AssigneesURL             string     `json:"assignees_url,omitempty"`
-	BranchesURL              string     `json:"branches_url,omitempty"`
-	TagsURL                  string     `json:"tags_url,omitempty"`
+	BranchesURL              string     `json:"branches_url,omitempty" db:"branches_url"`
+	TagsURL                  string     `json:"tags_url,omitempty" db:"tags_url"`
 	BlobsURL                 string     `json:"blobs_url,omitempty"`
 	GitTagsURL               string     `json:"git_tags_url,omitempty"`
 	GitRefsURL               string     `json:"git_refs_url,omitempty"`
 	TreesURL                 string     `json:"trees_url,omitempty"`
-	StatusesURL              string     `json:"statuses_url,omitempty"`
+	StatusesURL              string     `json:"statuses_url,omitempty" db:"statuses_url"`
 	LanguagesURL             string     `json:"languages_url,omitempty"`
 	StargazersURL            string     `json:"stargazers_url,omitempty"`
 	ContributorsURL          string     `json:"contributors_url,omitempty"`
 	SubscribersURL           string     `json:"subscribers_url,omitempty"`
 	SubscriptionURL          string     `json:"subscription_url,omitempty"`
-	CommitsURL               string     `json:"commits_url,omitempty"`
+	CommitsURL               string     `json:"commits_url,omitempty" db:"commits_url"`
 	GitCommitsURL            string     `json:"git_commits_url,omitempty"`
 	CommentsURL              string     `json:"comments_url,omitempty"`
 	IssueCommentURL          string     `json:"issue_comment_url,omitempty"`
 	ContentsURL              string     `json:"contents_url,omitempty"`
 	CompareURL               string     `json:"compare_url,omitempty"`
-	MergesURL                string     `json:"merges_url,omitempty"`
+	MergesURL                string     `json:"merges_url,omitempty" db:"merges_url"`
 	ArchiveURL               string     `json:"archive_url,omitempty"`
 	DownloadsURL             string     `json:"downloads_url,omitempty"`
-	IssuesURL                string     `json:"issues_url,omitempty"`
-	PullsURL                 string     `json:"pulls_url,omitempty"`
+	IssuesURL                string     `json:"issues_url,omitempty" db:"issues_url"`
+	PullsURL                 string     `json:"pulls_url,omitempty" db:"pulls_url"`
 	MilestonesURL            string     `json:"milestones_url,omitempty"`
 	NotificationsURL         string     `json:"notifications_url,omitempty"`
 	LabelsURL                string     `json:"labels_url,omitempty"`
 	ReleasesURL              string     `json:"releases_url,omitempty"`
 	DeploymentsURL           string     `json:"deployments_url,omitempty"`
-	CreatedAt                string     `json:"created_at,omitempty"`
-	UpdatedAt                string     `json:"updated_at,omitempty"`
-	PushedAt                 string     `json:"pushed_at,omitempty"`
+	CreatedAt                string     `json:"created_at,omitempty" db:"created_at"`
+	UpdatedAt                string     `json:"updated_at,omitempty" db:"updated_at"`
+	PushedAt                 string     `json:"pushed_at,omitempty" db:"pushed_at"`
 	GitURL                   string     `json:"git_url,omitempty"`
 	SshURL                   string     `json:"ssh_url,omitempty"`
 	CloneURL                 string     `json:"clone_url,omitempty"`
@@ -170,7 +170,7 @@ type GithubRepos struct {
 	HasDiscussions           bool       `json:"has_discussions,omitempty"`
 	ForksCount               int        `json:"forks_counts,omitempty"`
 	MirrorURL                string     `json:"mirror_url,omitempty"`
-	Archived                 bool       `json:"archived,omitempty"`
+	Archived                 bool       `json:"archived,omitempty" db:"archived"`
 	Disable                  bool       `json:"disable,omitempty"`
 	OpenIssuesCount          int        `json:"open_issues_count,omitempty"`
 	License                  string     `json:"license,omitempty"`
@@ -178,7 +178,7 @@ type GithubRepos struct {
 	IsTemplate               bool       `json:"is_template,omitempty"`
 	WebCommitSignOffRequired bool       `json:"web_commit_signoff_required,omitempty"`
 	Topics                   []string   `json:"topics,omitempty"`
-	Visibility               string     `json:"visibility,omitempty"`
+	Visibility               string     `json:"visibility,omitempty" db:"visibility"`
 	Forks                    int        `json:"forks,omitempty"`
 	OpenIssues               int        `json:"open_issues,omitempty"`
 	Watchers                 int        `json:"watchers,omitempty"`

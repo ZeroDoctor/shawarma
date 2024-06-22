@@ -36,7 +36,6 @@ func (api *API) Run(ctx context.Context, address ...string) error {
 
 func (api *API) controllerV1(router *gin.RouterGroup) {
 	router.POST("/register/github/user", api.registerGithubUser)
-	router.POST("/register/org", api.registerOrganization)
 	router.POST("/register/runner", api.registerRunner)
 
 	router.POST("/event/branch", api.branchUpdateEvent)

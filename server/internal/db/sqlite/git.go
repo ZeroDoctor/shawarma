@@ -157,3 +157,7 @@ func (s *SqliteDB) InsertGithubAuthUser(user model.GithubUser) (model.GithubUser
 	_, err = s.conn.NamedExec(insert, user)
 	return user, err
 }
+
+func (s *SqliteDB) InsertGithubUserOrgs(userID string, org model.GithubOrg) {
+
+}
