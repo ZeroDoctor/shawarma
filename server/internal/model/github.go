@@ -1,52 +1,54 @@
 package model
 
 type GithubUser struct {
-	Login                   string         `json:"login,omitempty"`
-	ID                      int            `json:"id,omitempty" db:"id"`
-	NodeID                  string         `json:"node_id,omitempty"`
-	AvatarURL               string         `json:"avatar_url,omitempty" db:"avatar_url"`
-	GravatarID              string         `json:"gravatar_id,omitempty" db:"gravatar_id"`
-	URL                     string         `json:"url,omitempty" db:"url"`
-	HtmlURL                 string         `json:"html_url,omitempty"`
-	FollowersURL            string         `json:"followers_url,omitempty"`
-	FollowingURL            string         `json:"following_url,omitempty"`
-	GistsURL                string         `json:"gists_url,omitempty"`
-	StarredURL              string         `json:"starred_url,omitempty"`
-	SubscriptionsURL        string         `json:"subscriptions_url,omitempty"`
-	OrganizationsURL        string         `json:"organizations_url,omitempty" db:"organizations_url"`
-	ReposURL                string         `json:"repos_url,omitempty" db:"repos_url"`
-	EventsURL               string         `json:"events_url,omitempty"`
-	ReceivedEventsURL       string         `json:"received_events_url,omitempty"`
-	Type                    string         `json:"type,omitempty" db:"type"`
-	SiteAdmin               bool           `json:"site_admin,omitempty"`
-	Name                    string         `json:"name,omitempty" db:"name"`
-	Company                 string         `json:"company,omitempty" db:"company"`
-	Blog                    string         `blog:"blog,omitempty"`
-	Location                string         `json:"location,omitempty"`
-	Email                   string         `json:"email,omitempty"`
-	Hireable                bool           `json:"hireable,omitempty"`
-	Bio                     string         `json:"bio,omitempty"`
-	TwitterUsername         string         `json:"twitter_username,omitempty"`
-	PublicRepos             int            `json:"public_repos,omitempty"`
-	PublicGists             int            `json:"public_gists,omitempty"`
-	Followers               int            `json:"followers,omitempty"`
-	Following               int            `json:"following,omitempty"`
-	CreatedAt               string         `json:"created_at,omitempty" db:"created_at"`
-	UpdatedAt               string         `json:"updated_at,omitempty" db:"updated_at"`
-	PrivateGists            int            `json:"private_gists,omitempty"`
-	TotalPrivateRepos       int            `json:"total_private_repos,omitempty"`
-	OwnedPrivateRepos       int            `json:"owned_private_repos,omitempty"`
-	DiskUsage               int            `json:"disk_usage,omitempty"`
-	Collaborators           int            `json:"collaborators,omitempty"`
-	TwoFactorAuthentication bool           `json:"two_factor_authentication,omitempty"`
-	Plan                    GithubUserPlan `json:"plan,omitempty"`
+	Login                   string     `json:"login,omitempty"`
+	ID                      int        `json:"id,omitempty" db:"id"`
+	NodeID                  string     `json:"node_id,omitempty"`
+	AvatarURL               string     `json:"avatar_url,omitempty" db:"avatar_url"`
+	GravatarID              string     `json:"gravatar_id,omitempty" db:"gravatar_id"`
+	URL                     string     `json:"url,omitempty" db:"url"`
+	HtmlURL                 string     `json:"html_url,omitempty"`
+	FollowersURL            string     `json:"followers_url,omitempty"`
+	FollowingURL            string     `json:"following_url,omitempty"`
+	GistsURL                string     `json:"gists_url,omitempty"`
+	StarredURL              string     `json:"starred_url,omitempty"`
+	SubscriptionsURL        string     `json:"subscriptions_url,omitempty"`
+	OrganizationsURL        string     `json:"organizations_url,omitempty" db:"organizations_url"`
+	ReposURL                string     `json:"repos_url,omitempty" db:"repos_url"`
+	EventsURL               string     `json:"events_url,omitempty"`
+	ReceivedEventsURL       string     `json:"received_events_url,omitempty"`
+	Type                    string     `json:"type,omitempty" db:"type"`
+	SiteAdmin               bool       `json:"site_admin,omitempty"`
+	Name                    string     `json:"name,omitempty" db:"name"`
+	Company                 string     `json:"company,omitempty" db:"company"`
+	Blog                    string     `blog:"blog,omitempty"`
+	Location                string     `json:"location,omitempty"`
+	Email                   string     `json:"email,omitempty"`
+	Hireable                bool       `json:"hireable,omitempty"`
+	Bio                     string     `json:"bio,omitempty"`
+	TwitterUsername         string     `json:"twitter_username,omitempty"`
+	PublicRepos             int        `json:"public_repos,omitempty"`
+	PublicGists             int        `json:"public_gists,omitempty"`
+	Followers               int        `json:"followers,omitempty"`
+	Following               int        `json:"following,omitempty"`
+	CreatedAt               string     `json:"created_at,omitempty" db:"created_at"`
+	UpdatedAt               string     `json:"updated_at,omitempty" db:"updated_at"`
+	PrivateGists            int        `json:"private_gists,omitempty"`
+	TotalPrivateRepos       int        `json:"total_private_repos,omitempty"`
+	OwnedPrivateRepos       int        `json:"owned_private_repos,omitempty"`
+	DiskUsage               int        `json:"disk_usage,omitempty"`
+	Collaborators           int        `json:"collaborators,omitempty"`
+	TwoFactorAuthentication bool       `json:"two_factor_authentication,omitempty"`
+	Plan                    GithubPlan `json:"plan,omitempty"`
 }
 
-type GithubUserPlan struct {
+type GithubPlan struct {
 	Name          string `json:"name,omitempty"`
 	Space         int    `json:"space,omitempty"`
 	PrivateRepos  int    `json:"private_repos,omitempty"`
 	Collaborators int    `json:"collaborators,omitempty"`
+	FilledSeats   int    `json:"filled_seats,omitempty"`
+	Seats         int    `json:"seats,omitempty"`
 }
 
 type GithubTokenResponse struct {
@@ -70,37 +72,56 @@ type GithubUserOrg struct {
 	Description      string `json:"description,omitempty"`
 }
 
+type GithubUsersOrgs struct {
+	UserID    string `json:"github_user_id,omitempty" db:"github_user_id"`
+	OrgID     string `json:"github_org_id,omitempty" db:"github_org_id"`
+	CreatedAt Time   `json:"created_at,omitempty" db:"created_at"`
+}
+
 type GithubOrg struct {
-	Login                   string `json:"login,omitempty"`
-	ID                      int    `json:"id,omitempty" db:"id"`
-	NodeID                  string `json:"node_id,omitempty"`
-	URL                     string `json:"url,omitempty" db:"url"`
-	ReposURL                string `json:"repos_url,omitempty" db:"repos_url"`
-	EventsURL               string `json:"events_url,omitempty"`
-	HooksURL                string `json:"hooks_url,omitempty" db:"hooks_url"`
-	IssuesURL               string `json:"issues_url,omitempty" db:"issues_url"`
-	MembersURL              string `json:"members_url,omitempty" db:"members_url"`
-	PublicMembersURL        string `json:"public_members_url,omitempty" db:"public_members_url"`
-	AvatarURL               string `json:"avatar_url,omitempty" db:"avatar_url"`
-	Description             string `json:"description,omitempty" db:"description"`
-	Name                    string `json:"name,omitempty" db:"name"`
-	Company                 string `json:"company,omitempty" db:"company"`
-	Blog                    string `json:"blog,omitempty"`
-	Location                string `json:"location,omitempty"`
-	Email                   string `json:"email,omitempty"`
-	TwitterUsername         string `json:"twitter_username,omitempty"`
-	IsVerified              bool   `json:"is_verified,omitempty"`
-	HasOrganizationProjects bool   `json:"has_organization_projects,omitempty"`
-	HasRepositoryProjects   bool   `json:"has_repository_projects,omitempty"`
-	PublicRepos             int    `json:"public_repos,omitempty"`
-	PublicGists             int    `json:"public_gists,omitempty"`
-	Followers               int    `json:"followers,omitempty"`
-	Following               int    `json:"followings,omitempty"`
-	HtmlURL                 string `json:"html_url,omitempty"`
-	CreatedAt               string `json:"created_at,omitempty" db:"created_at"`
-	UpdatedAt               string `json:"updated_at,omitempty" db:"updated_at"`
-	ArchivedAt              string `json:"archived_at,omitempty" db:"archived_at"`
-	Type                    string `json:"type,omitempty" db:"type"`
+	Login                                string     `json:"login,omitempty"`
+	ID                                   int        `json:"id,omitempty" db:"id"`
+	NodeID                               string     `json:"node_id,omitempty"`
+	URL                                  string     `json:"url,omitempty" db:"url"`
+	ReposURL                             string     `json:"repos_url,omitempty" db:"repos_url"`
+	EventsURL                            string     `json:"events_url,omitempty"`
+	HooksURL                             string     `json:"hooks_url,omitempty" db:"hooks_url"`
+	IssuesURL                            string     `json:"issues_url,omitempty" db:"issues_url"`
+	MembersURL                           string     `json:"members_url,omitempty" db:"members_url"`
+	PublicMembersURL                     string     `json:"public_members_url,omitempty" db:"public_members_url"`
+	AvatarURL                            string     `json:"avatar_url,omitempty" db:"avatar_url"`
+	Description                          string     `json:"description,omitempty" db:"description"`
+	Name                                 string     `json:"name,omitempty" db:"name"`
+	Company                              string     `json:"company,omitempty" db:"company"`
+	Blog                                 string     `json:"blog,omitempty"`
+	Location                             string     `json:"location,omitempty"`
+	Email                                string     `json:"email,omitempty"`
+	TwitterUsername                      string     `json:"twitter_username,omitempty"`
+	IsVerified                           bool       `json:"is_verified,omitempty"`
+	HasOrganizationProjects              bool       `json:"has_organization_projects,omitempty"`
+	HasRepositoryProjects                bool       `json:"has_repository_projects,omitempty"`
+	PublicRepos                          int        `json:"public_repos,omitempty"`
+	PublicGists                          int        `json:"public_gists,omitempty"`
+	Followers                            int        `json:"followers,omitempty"`
+	Following                            int        `json:"followings,omitempty"`
+	HtmlURL                              string     `json:"html_url,omitempty"`
+	CreatedAt                            string     `json:"created_at,omitempty" db:"created_at"`
+	UpdatedAt                            string     `json:"updated_at,omitempty" db:"updated_at"`
+	ArchivedAt                           string     `json:"archived_at,omitempty" db:"archived_at"`
+	Type                                 string     `json:"type,omitempty" db:"type"`
+	TotalPrivateRepos                    int        `json:"total_private_repos,omitempty"`
+	OwnedPrivateRepos                    int        `json:"owned_private_repos,omitempty"`
+	PrivateGists                         int        `json:"private_gists,omitempty"`
+	DiskUsage                            int        `json:"disk_usage,omitempty"`
+	Collaborators                        int        `json:"collaborators,omitempty"`
+	BillingEmail                         string     `json:"billing_email,omitempty"`
+	Plan                                 GithubPlan `json:"plan,omitempty"`
+	DefaultRepositoryPermission          string     `json:"default_repository_permission,omitempty"`
+	MembersCanCreateRepositories         bool       `json:"members_can_create_repositories,omitempty"`
+	MembersAllowedRepositoryCreationType string     `json:"members_allowed_repository_creation_type,omitempty"`
+	MembersCanCreatePublicRepositories   bool       `json:"members_can_create_public_repositories,omitempty"`
+	MembersCanCreatePrivateRepositories  bool       `json:"members_can_create_private_repositories,omitempty"`
+	MembersCanCreateInternalRepositories bool       `json:"members_can_create_internal_repositories,omitempty"`
 }
 
 type GithubRepos struct {

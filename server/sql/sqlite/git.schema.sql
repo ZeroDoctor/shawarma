@@ -1,16 +1,3 @@
-CREATE TABLE IF NOT EXISTS github_users (
-    id                INT PRIMARY KEY,
-    avatar_url        TEXT,
-    gravatar_id       TEXT,
-    "url"             TEXT,
-    organizations_url TEXT,
-    repos_url         TEXT,
-    "type"            TEXT,
-    "name"            TEXT UNIQUE NOT NULL,
-    created_at        TEXT,
-    updated_at        TEXT
-);
-
 CREATE TABLE IF NOT EXISTS organizations (
     uuid        TEXT UNIQUE, -- yes I know
     "owner"     TEXT,

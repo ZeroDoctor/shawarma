@@ -41,10 +41,9 @@ func (s *Service) SaveGithubAuthUser(user model.User) (model.User, error) {
 				githubUserOrgs[i].Login, err,
 			)
 		}
+		org, err = s.db.InsertGithubUserOrgs(githubUser.ID, org)
 		githubOrgs = append(githubOrgs, org)
 	}
-	// TODO: save githubOrgs with github user id
-	//	also insert new row for org with generic values
 
 	user, err = s.db.InsertUser(user)
 	if err != nil {
@@ -109,6 +108,7 @@ func (s *Service) GetGithubAuthUser(token string) (model.GithubUser, error) {
 	return user, nil
 }
 
+// TODO: need to handle pagination
 func (s *Service) GetGithubUserOrgs(token string, userOrgsURL string) ([]model.GithubUserOrg, error) {
 	var userOrgs []model.GithubUserOrg
 

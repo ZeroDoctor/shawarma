@@ -21,6 +21,7 @@ type DB interface {
 	InsertCommit(model.Commit) (model.Commit, error)
 	InsertRunner(model.Runner) (model.Runner, error)
 	InsertUser(model.User) (model.User, error)
+	InsertGithubUserOrgs(int, model.GithubOrg) (model.GithubOrg, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {
