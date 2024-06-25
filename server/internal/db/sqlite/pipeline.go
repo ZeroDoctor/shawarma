@@ -2,7 +2,7 @@ package sqlite
 
 import (
 	"github.com/google/uuid"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, error) {

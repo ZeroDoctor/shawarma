@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func (api *API) registerRunner(ctx *gin.Context) {

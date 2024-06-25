@@ -29,12 +29,50 @@ CREATE TABLE IF NOT EXISTS github_orgs (
     "type"             TEXT,
 );
 
+CREATE TABLE IF NOT EXISTS github_owners (
+    id                INT PRIMARY KEY,
+    avatar_url        TEXT,
+    gravatar_id       TEXT,
+    "url"             TEXT,
+    organizations_url TEXT,
+    repos_url         TEXT,
+    "type"            TEXT,
+);
+
 CREATE TABLE IF NOT EXISTS github_users_orgs (
-    github_user_id INT,
-    github_org_id  INT,
+    user_id INT,
+    org_id  INT,
     created_at     INT,
 
-    PRIMARY KEY(github_user_id, github_org_id),
-    FOREIGN KEY(github_user_id) REFERENCES github_users(id),
-    FOREIGN KEY(github_org_id) REFERENCES github_orgs(id)
+    PRIMARY KEY(user_id, org_id),
+    FOREIGN KEY(user_id) REFERENCES github_users(id),
+    FOREIGN KEY(org_id) REFERENCES github_orgs(id)
+);
+
+CREATE TABLE IF NOT EXISTS github_repos (
+    id                INT PRIMARY KEY,
+    owner_id          INT NOT NULL,
+    "name"            TEXT,
+    full_name         TEXT,
+    "description"     TEXT,
+    "url"             TEXT,
+    collaborators_url TEXT,
+    hooks_url         TEXT,
+    issue_events_url  TEXT,
+    branches_url      TEXT,
+    tags_url          TEXT,
+    statuses_url      TEXT,
+    commits_url       TEXT,
+    merges_url        TEXT,
+    issues_url        TEXT,
+    pulls_url         TEXT,
+    created_at        TEXT,
+    updated_at        TEXT,
+    pushed_at         TEXT,
+    has_issues        INT,
+    archived          INT,
+    open_issues_count INT,
+    visibility        TEXT,
+
+    FOREIGN KEY(owner_id) REFERENCES github_owners(id),
 );

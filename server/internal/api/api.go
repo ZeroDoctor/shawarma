@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
-	"github.com/zerodoctor/shawarma/internal/service"
+	"github.com/zerodoctor/shawarma/pkg/service"
 )
 
 var log *logrus.Logger = logger.Log

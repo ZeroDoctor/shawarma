@@ -11,20 +11,20 @@ Fully customizable and open source CI/CD with [pickle](https://github.com/apple/
 
 ## Planned Integrations
 
-### Hubs
+### Hubs (via Static Plugin)
 
 - [Github](https://github.com/)
 - [Forgejo](https://forgejo.org/)
 - [Gitlab](https://gitlab.com)
 - [Bitbucket](https://bitbucket.org/)
 
-### Auths
+### Auths (via Static Plugin)
 
 - [Vault](https://www.hashicorp.com/products/vault)
 - Some LDAP (not sure which one)
 - Customizable enough for in-house auths
 
-### Runners
+### Runners (via Static Plugin)
 
 - [SSH](https://man.openbsd.org/ssh)
 - Containerizations
@@ -33,7 +33,7 @@ Fully customizable and open source CI/CD with [pickle](https://github.com/apple/
 - [Nomad](https://www.nomadproject.io/)
 - [Kubernetes](https://kubernetes.io/)
 
-### DBs
+### DBs (via Static Plugin) 
 
 - [Sqlite](https://www.sqlite.org/index.html)
 - [Postgres](https://www.postgresql.org/)

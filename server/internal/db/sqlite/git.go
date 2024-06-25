@@ -1,10 +1,8 @@
 package sqlite
 
 import (
-	"time"
-
 	"github.com/google/uuid"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func (s *SqliteDB) InsertOrganization(organization model.Organization) (model.Organization, error) {
@@ -141,59 +139,4 @@ func (s *SqliteDB) InsertCommit(commit model.Commit) (model.Commit, error) {
 
 	_, err := s.conn.NamedExec(insert, commit)
 	return commit, err
-}
-
-func (s *SqliteDB) InsertGithubAuthUser(user model.GithubUser) (model.GithubUser, error) {
-	var err error
-
-	insert := `INSERT INTO github_users (
-		id, avatar_url, gravatar_id, "url",
-		organizations_url, repos_url, "type",
-		"name", created_at, updated_at
-	) VALUES (
-		:id, :avatar_url, :gravatar_id, :url,
-		:organizations_url, :repos_url, :type,
-		:name, :created_at, :updated_at
-	);`
-
-	_, err = s.conn.NamedExec(insert, user)
-	return user, err
-}
-
-func (s *SqliteDB) InsertGithubUserOrgs(userID int, org model.GithubOrg) (model.GithubOrg, error) {
-	var err error
-	org, err = s.InsertGithubOrgs(org)
-	if err != nil {
-		return org, err
-	}
-
-	insert := `INSERT INTO github_users_orgs (
-		github_user_id, github_org_id, created_at
-	) VALUES (
-		$1, $2, $3
-	) ON CONFLICT (github_user_id, github_org_id) DO NOTHING;`
-
-	_, err = s.conn.Exec(
-		insert, userID, org.ID, model.Time(time.Now()),
-	)
-	return org, err
-}
-
-func (s *SqliteDB) InsertGithubOrgs(org model.GithubOrg) (model.GithubOrg, error) {
-	var err error
-
-	insert := `INSERT INTO github_orgs (
-		id, "url", repos_url, hooks_url,
-		issues_url, members_url, public_members_url,
-		avatar_url, "description", "name", company,
-		created_at, updated_at, archived_at, "type"
-	) VALUES (
-		:id, :url, :repos_url, :hooks_url,
-		:issues_url, :members_url, :public_members_url,
-		:avatar_url, :description, :name, :company,
-		:created_at, :updated_at, :archived_at, :type
-	) ON CONFLICT (id) DO NOTHING;`
-
-	_, err = s.conn.NamedExec(insert, org)
-	return org, err
 }

@@ -4,23 +4,17 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func (s *SqliteDB) InsertUser(user model.User) (model.User, error) {
 	var err error
 
-	githubUser, err := s.InsertGithubAuthUser(user.GithubUser)
+	session, err := uuid.NewV7()
 	if err != nil {
 		return user, err
 	}
-	user.GithubUserID = githubUser.ID
-
-	id, err := uuid.NewV7()
-	if err != nil {
-		return user, err
-	}
-	user.Session = id.String()
+	user.Session = session.String()
 
 	now := time.Now()
 	user.CreatedAt = model.Time(now)

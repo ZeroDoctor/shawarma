@@ -14,7 +14,7 @@ var log *logrus.Logger = logger.Log
 func main() {
 	ctx := context.Background()
 
-	db, err := sqlite.NewDB(ctx)
+	db, err := sqlite.NewConnection(ctx, "shawarma.db")
 	if err != nil {
 		log.Fatalf("failed to init db [error=%s]", err.Error())
 	}

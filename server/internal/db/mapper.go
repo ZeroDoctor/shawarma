@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/zerodoctor/shawarma/internal/model"
 	"github.com/zerodoctor/shawarma/pkg/config"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func NewPipeline(repoID string, runnerID string, pipe config.Pipeline) model.Pipeline {

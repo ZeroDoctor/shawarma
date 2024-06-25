@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 func (api *API) registerGithubUser(ctx *gin.Context) {
@@ -15,12 +15,12 @@ func (api *API) registerGithubUser(ctx *gin.Context) {
 		return
 	}
 
-	var err error
-	user, err = api.service.SaveGithubAuthUser(user)
-	if err != nil {
-		internalError(ctx, err)
-		return
-	}
+	// var err error
+	// user, err = api.service.SaveGithubAuthUser(user)
+	// if err != nil {
+	// 	internalError(ctx, err)
+	// 	return
+	// }
 
 	ctx.JSON(http.StatusAccepted, user)
 }
