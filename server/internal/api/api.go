@@ -8,14 +8,16 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
+	"github.com/zerodoctor/shawarma/pkg/remote"
 	"github.com/zerodoctor/shawarma/pkg/service"
 )
 
 var log *logrus.Logger = logger.Log
 
 type API struct {
-	db      db.DB
-	service *service.Service
+	db        db.DB
+	service   *service.Service
+	gitRemote remote.GitRemote
 }
 
 func NewAPI(db db.DB) *API {
@@ -35,7 +37,7 @@ func (api *API) Run(ctx context.Context, address ...string) error {
 }
 
 func (api *API) controllerV1(router *gin.RouterGroup) {
-	router.POST("/register/github/user", api.registerGithubUser)
+	router.POST("/register/user", api.registerUser)
 	router.POST("/register/runner", api.registerRunner)
 
 	router.POST("/event/branch", api.branchUpdateEvent)

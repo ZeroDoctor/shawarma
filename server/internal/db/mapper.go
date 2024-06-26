@@ -33,8 +33,8 @@ func NewPipeline(repoID string, runnerID string, pipe config.Pipeline) model.Pip
 	return model.Pipeline{
 		Type:       pipe.Type,
 		Status:     model.CREATED,
-		CreatedAt:  model.Time(now),
-		ModifiedAt: model.Time(now),
+		CreatedAt:  now,
+		ModifiedAt: now,
 		RepoID:     uuid.MustParse(repoID),
 		RunnerID:   uuid.MustParse(runnerID),
 		Steps:      steps,
@@ -66,8 +66,8 @@ func NewStep(pipelineID int, step config.Step) model.Step {
 		Commands:   step.Commands,
 		Privileged: step.Privileged,
 		Detach:     step.Detach,
-		CreatedAt:  model.Time(now),
-		ModifiedAt: model.Time(now),
+		CreatedAt:  now,
+		ModifiedAt: now,
 
 		PipelineID: pipelineID,
 	}
@@ -85,8 +85,8 @@ func newEvent[T config.StatusEvent | config.TimeEvent](eType model.StatusEvent, 
 	now := time.Now()
 	e := model.Event{
 		Type:       eType,
-		CreatedAt:  model.Time(now),
-		ModifiedAt: model.Time(now),
+		CreatedAt:  now,
+		ModifiedAt: now,
 		StatusName: status,
 	}
 

@@ -8,10 +8,18 @@ import (
 )
 
 type DB struct {
-	conn *sqlx.DB
+	dbType string
+	conn   *sqlx.DB
 }
 
-func (s *DB) InsertGithubAuthUser(user model.GithubUser) (model.GithubUser, error) {
+func NewDB(dbType string, conn *sqlx.DB) *DB {
+	return &DB{
+		dbType: dbType,
+		conn:   conn,
+	}
+}
+
+func (s *DB) SaveGithubAuthUser(user model.GithubUser) (model.GithubUser, error) {
 	var err error
 
 	insert := `INSERT INTO github_users (
@@ -22,15 +30,15 @@ func (s *DB) InsertGithubAuthUser(user model.GithubUser) (model.GithubUser, erro
 		:id, :avatar_url, :gravatar_id, :url,
 		:organizations_url, :repos_url, :type,
 		:name, :created_at, :updated_at
-	);` // TODO: change to upsert
+	);`
 
 	_, err = s.conn.NamedExec(insert, user)
 	return user, err
 }
 
-func (s *DB) InsertGithubUserOrg(userID int, org model.GithubOrg) (model.GithubOrg, error) {
+func (s *DB) SaveGithubUserOrg(userID int, org model.GithubOrg) (model.GithubOrg, error) {
 	var err error
-	org, err = s.InsertGithubOrgs(org)
+	org, err = s.SaveGithubOrgs(org)
 	if err != nil {
 		return org, err
 	}
@@ -47,7 +55,7 @@ func (s *DB) InsertGithubUserOrg(userID int, org model.GithubOrg) (model.GithubO
 	return org, err
 }
 
-func (s *DB) InsertGithubOrgs(org model.GithubOrg) (model.GithubOrg, error) {
+func (s *DB) SaveGithubOrgs(org model.GithubOrg) (model.GithubOrg, error) {
 	var err error
 
 	insert := `INSERT INTO github_orgs (
@@ -60,13 +68,27 @@ func (s *DB) InsertGithubOrgs(org model.GithubOrg) (model.GithubOrg, error) {
 		:issues_url, :members_url, :public_members_url,
 		:avatar_url, :description, :name, :company,
 		:created_at, :updated_at, :archived_at, :type
-	) ON CONFLICT (id) DO NOTHING;` // TODO: change to upsert
+	) ON CONFLICT (id) DO UPDATE SET
+		"url"              = excluded.url,
+		repos_url          = excluded.repos_url,
+		hooks_url          = excluded.hooks_url,
+		issues_url         = excluded.issues_url,
+		members_url        = excluded.members_url,
+		public_members_url = excluded.public_members_url,
+		avatar_url         = excluded.avatar_url,
+		"description"      = excluded.description,
+		"name"             = excluded.name,
+		company            = excluded.company,
+		created_at         = excluded.created_at,
+		updated_at         = excluded.updated_at,
+		archived_at        = excluded.archived_at,
+		"type"             = excluded.type;`
 
 	_, err = s.conn.NamedExec(insert, org)
 	return org, err
 }
 
-func (s *DB) InsertGithubOwner(owner model.GithubOwner) (model.GithubOwner, error) {
+func (s *DB) SaveGithubOwner(owner model.GithubOwner) (model.GithubOwner, error) {
 	var err error
 
 	insert := `INSERT INTO github_owners (
@@ -75,16 +97,22 @@ func (s *DB) InsertGithubOwner(owner model.GithubOwner) (model.GithubOwner, erro
 	) VALUES (
 		:id, :avatar_url, :gravatar_id, :url,
 		:organizations_url, :repos_url, :type
-	) ON CONFLICT (id) DO NOTHING;` // TODO: change to upsert for avatar
+	) ON CONFLICT (id) DO UPDATE SET 
+		avatar_url        = excluded.avatar_url, 
+		gravatar_id       = excluded.gravatar_id,
+		"url"             = excluded.url,
+		organizations_url = excluded.organizations_url,
+		repos_url         = excluded.repos_url,
+		"type"            = excluded.type;`
 
 	_, err = s.conn.NamedExec(insert, owner)
 	return owner, err
 }
 
-func (s *DB) InsertGithubRepo(repo model.GithubRepo) (model.GithubRepo, error) {
+func (s *DB) SaveGithubRepo(repo model.GithubRepo) (model.GithubRepo, error) {
 	var err error
 
-	owner, err := s.InsertGithubOwner(repo.Owner)
+	owner, err := s.SaveGithubOwner(repo.Owner)
 	if err != nil {
 		return repo, err
 	}

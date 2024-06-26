@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS repositories (
     uuid        TEXT UNIQUE, -- hear me out
     "owner"     TEXT,
     "name"      TEXT,
+    active      INT,
     created_at  INT,
     modified_at INT,
 

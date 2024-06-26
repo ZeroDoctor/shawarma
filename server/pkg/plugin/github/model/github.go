@@ -40,6 +40,7 @@ type GithubUser struct {
 	Collaborators           int        `json:"collaborators,omitempty"`
 	TwoFactorAuthentication bool       `json:"two_factor_authentication,omitempty"`
 	Plan                    GithubPlan `json:"plan,omitempty"`
+	Token                   string     `db:"token"`
 
 	Orgs  []GithubOrg
 	Repos []GithubRepo

@@ -9,12 +9,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zerodoctor/shawarma/pkg/service"
+	"github.com/zerodoctor/shawarma/pkg/httputils"
 )
 
 const (
 	GITHUB_API_VERSION string = "2022-11-28"
 	GITHUB_API_ACCEPT  string = "application/vnd.github+json"
+
+	HTTP_GET     string = "GET"
+	HTTP_POST    string = "POST"
+	HTTP_PUT     string = "PUT"
+	HTTP_OPTIONS string = "OPTIONS"
+	HTTP_PATCH   string = "PATCH"
+	HTTP_DELETE  string = "DELETE"
 )
 
 var (
@@ -23,27 +30,28 @@ var (
 )
 
 type GithubRequest struct {
-	*service.Request
+	*httputils.Request
 }
 
 func NewRequest(method, u string, body io.Reader) *GithubRequest {
 	uri, err := url.Parse(u)
 	if err != nil {
 		return &GithubRequest{
-			Request: &service.Request{
-
+			Request: &httputils.Request{
 				Err: fmt.Errorf("failed to parse [url=%s] [error=%w]", u, err),
 			},
 		}
 	}
 
-	return &GithubRequest{
-		Request: &service.Request{
+	grequest := &GithubRequest{
+		Request: &httputils.Request{
 			Uri:    uri,
 			Method: method,
 			Body:   body,
 		},
 	}
+
+	return grequest.OptionGithubPagination()
 }
 
 func (r *GithubRequest) OptionGithubHeaders(token string) *GithubRequest {
@@ -90,7 +98,6 @@ func (r *GithubRequest) OptionGithubPagination() *GithubRequest {
 	}
 
 	if r.Next != nil {
-		r.Err = ErrPaginationTypeExists
 		return r
 	}
 

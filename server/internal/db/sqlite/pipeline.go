@@ -5,7 +5,7 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, error) {
+func (s *SqliteDB) SavePipeline(pipeline model.Pipeline) (model.Pipeline, error) {
 	insert := `INSERT INTO pipelines (
 		"type", "status", 
 		created_at, modified_at,
@@ -32,7 +32,7 @@ func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, erro
 
 	for i := range pipeline.Steps {
 		pipeline.Steps[i].PipelineID = pipeline.ID
-		pipeline.Steps[i], err = s.InsertStep(pipeline.Steps[i])
+		pipeline.Steps[i], err = s.SaveStep(pipeline.Steps[i])
 		if err != nil {
 			return pipeline, err
 		}
@@ -40,7 +40,7 @@ func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, erro
 
 	for i := range pipeline.Events {
 		pipeline.Events[i].PipelineID = pipeline.ID
-		pipeline.Events[i], err = s.InsertEvent(pipeline.Events[i])
+		pipeline.Events[i], err = s.SaveEvent(pipeline.Events[i])
 		if err != nil {
 			return pipeline, err
 		}
@@ -49,7 +49,7 @@ func (s *SqliteDB) InsertPipeline(pipeline model.Pipeline) (model.Pipeline, erro
 	return pipeline, nil
 }
 
-func (s *SqliteDB) InsertStep(step model.Step) (model.Step, error) {
+func (s *SqliteDB) SaveStep(step model.Step) (model.Step, error) {
 	var err error
 	step.UUID, err = uuid.NewV7()
 	if err != nil {
@@ -82,7 +82,7 @@ func (s *SqliteDB) InsertStep(step model.Step) (model.Step, error) {
 
 	for i := range step.Events {
 		step.Events[i].StepID = step.UUID
-		step.Events[i], err = s.InsertEvent(step.Events[i])
+		step.Events[i], err = s.SaveEvent(step.Events[i])
 		if err != nil {
 			return step, err
 		}
@@ -91,7 +91,7 @@ func (s *SqliteDB) InsertStep(step model.Step) (model.Step, error) {
 	return step, nil
 }
 
-func (s *SqliteDB) InsertEvent(event model.Event) (model.Event, error) {
+func (s *SqliteDB) SaveEvent(event model.Event) (model.Event, error) {
 	insert := `INSERT INTO events (
 		webhook, "type", "action",
 		deadline, created_at, modified_at,
@@ -115,7 +115,7 @@ func (s *SqliteDB) InsertEvent(event model.Event) (model.Event, error) {
 	return event, err
 }
 
-func (s *SqliteDB) InsertEnvironment(environment model.Environment) (model.Environment, error) {
+func (s *SqliteDB) SaveEnvironment(environment model.Environment) (model.Environment, error) {
 	insert := `INSERT INTO environments (
 		"key", "data", protected, 
 		created_at, modified_at, 

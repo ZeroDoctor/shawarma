@@ -5,7 +5,7 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-func (s *SqliteDB) InsertRunner(runner model.Runner) (model.Runner, error) {
+func (s *SqliteDB) SaveRunner(runner model.Runner) (model.Runner, error) {
 	var err error
 	runner.UUID, err = uuid.NewV7()
 	if err != nil {

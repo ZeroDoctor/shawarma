@@ -3,13 +3,15 @@ package service
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"os"
 
+	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/pkg/model"
-	"github.com/zerodoctor/shawarma/pkg/plugin/github/db"
+	gdb "github.com/zerodoctor/shawarma/pkg/plugin/github/db"
 	gmodel "github.com/zerodoctor/shawarma/pkg/plugin/github/model"
-	"github.com/zerodoctor/shawarma/pkg/service"
 )
 
 const (
@@ -19,18 +21,40 @@ const (
 	GITHUB_AUTH_USER_URL string = GITHUB_API_ENDPOINT + "/user"
 )
 
+var (
+	ErrMissingGithubCode error = errors.New("bad format") // NOTE: we want to hide reason from user
+	ErrFormatGithubCode  error = errors.New("bad format") // NOTE: we want to hide reason from user
+)
+
 type GithubService struct {
-	db db.DB
+	db *gdb.DB
 }
 
-func NewService(db db.DB) *GithubService {
-	return &GithubService{
-		db: db,
+func NewService() *GithubService {
+	return &GithubService{}
+}
+
+func (s *GithubService) Setup(db db.DB) {
+	s.db = gdb.NewDB(db.GetType(), db.GetConnection())
+}
+
+func (s *GithubService) RegisterUser(details map[string]interface{}) (model.User, error) {
+	codeInter, ok := details["code"]
+	if !ok {
+		return model.User{}, ErrMissingGithubCode
 	}
+
+	code, ok := codeInter.(string)
+	if !ok {
+		return model.User{}, ErrFormatGithubCode
+	}
+
+	return s.SaveGithubAuthUser(code)
 }
 
-func (s *GithubService) SaveGithubAuthUser(secret string, user model.User) (model.User, error) {
-	token, err := s.GetGithubToken(secret, user)
+func (s *GithubService) SaveGithubAuthUser(code string) (model.User, error) {
+	var user model.User
+	token, err := s.GetGithubToken(code)
 	if err != nil {
 		return user, fmt.Errorf("failed to fetch github token [error=%w]", err)
 	}
@@ -55,9 +79,12 @@ func (s *GithubService) SaveGithubAuthUser(secret string, user model.User) (mode
 	return user, nil
 }
 
-func (s *GithubService) GetGithubToken(secret string, user model.User) (string, error) {
-	resp, err := NewRequest(service.HTTP_POST, GITHUB_OAUTH_TOKEN_URL, nil).
-		OptionGithubHeaders(secret).
+func (s *GithubService) GetGithubToken(code string) (string, error) {
+	url := fmt.Sprintf("%s?code=%s&client_id=%s&client_secret=%s",
+		GITHUB_OAUTH_TOKEN_URL, code,
+		os.Getenv("GITHUB_CLIENT_ID"), os.Getenv("GITHUB_CLIENT_SECRET"),
+	)
+	resp, err := NewRequest(HTTP_POST, url, nil).
 		Do()
 	if err != nil {
 		return "", fmt.Errorf("failed to do request [error=%w]", err)
@@ -84,7 +111,7 @@ func (s *GithubService) GetGithubToken(secret string, user model.User) (string, 
 func (s *GithubService) GetGithubAuthUser(token string) (gmodel.GithubUser, error) {
 	var user gmodel.GithubUser
 
-	resp, err := NewRequest(service.HTTP_GET, GITHUB_AUTH_USER_URL, nil).
+	resp, err := NewRequest(HTTP_GET, GITHUB_AUTH_USER_URL, nil).
 		OptionGithubHeaders(token).
 		Do()
 	if err != nil {
@@ -121,7 +148,7 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 				githubUserOrgs[i].Login, err,
 			)
 		}
-		org, err = s.db.InsertGithubUserOrg(user.ID, org)
+		org, err = s.db.SaveGithubUserOrg(user.ID, org)
 		if err != nil {
 			return githubOrgs, fmt.Errorf("failed to save [org=%s] [error=%w]", org.Name, err)
 		}
@@ -134,7 +161,7 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 func (s *GithubService) GetGithubUserOrgs(token string, userOrgsURL string) ([]gmodel.GithubUserOrg, error) {
 	var userOrgs []gmodel.GithubUserOrg
 
-	resps, err := NewRequest(service.HTTP_GET, userOrgsURL, nil).
+	resps, err := NewRequest(HTTP_GET, userOrgsURL, nil).
 		OptionGithubHeaders(token).
 		OptionGithubPages(100).
 		DoAll()
@@ -165,7 +192,7 @@ func (s *GithubService) GetGithubUserOrgs(token string, userOrgsURL string) ([]g
 func (s *GithubService) GetGithubOrg(token string, orgURL string) (gmodel.GithubOrg, error) {
 	var org gmodel.GithubOrg
 
-	resp, err := NewRequest(service.HTTP_GET, orgURL, nil).
+	resp, err := NewRequest(HTTP_GET, orgURL, nil).
 		OptionGithubHeaders(token).
 		Do()
 	if err != nil {
@@ -209,7 +236,7 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 	}
 
 	for i := range repos {
-		repo, err := s.db.InsertGithubRepo(repos[i])
+		repo, err := s.db.SaveGithubRepo(repos[i])
 		if err != nil {
 			return repos, fmt.Errorf("failed to save [user=%s] [owner=%s] repo [error=%w]",
 				user.Name, repos[i].Owner.Login, err,
@@ -224,7 +251,7 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.GithubRepo, error) {
 	var repos []gmodel.GithubRepo
 
-	resps, err := NewRequest(service.HTTP_GET, reposURL, nil).
+	resps, err := NewRequest(HTTP_GET, reposURL, nil).
 		OptionGithubHeaders(token).
 		OptionGithubPages(100).
 		DoAll()

@@ -5,7 +5,7 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-func (s *SqliteDB) InsertOrganization(organization model.Organization) (model.Organization, error) {
+func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Organization, error) {
 	var err error
 	organization.UUID, err = uuid.NewV7()
 	if err != nil {
@@ -30,7 +30,7 @@ func (s *SqliteDB) InsertOrganization(organization model.Organization) (model.Or
 
 	for i := range organization.Repositories {
 		organization.Repositories[i].OrgID = organization.UUID
-		organization.Repositories[i], err = s.InsertRepository(organization.Repositories[i])
+		organization.Repositories[i], err = s.SaveRepository(organization.Repositories[i])
 		if err != nil {
 			return organization, err
 		}
@@ -38,7 +38,7 @@ func (s *SqliteDB) InsertOrganization(organization model.Organization) (model.Or
 
 	for i := range organization.Environments {
 		organization.Environments[i].OrgID = organization.UUID
-		organization.Environments[i], err = s.InsertEnvironment(organization.Environments[i])
+		organization.Environments[i], err = s.SaveEnvironment(organization.Environments[i])
 		if err != nil {
 			return organization, err
 		}
@@ -47,7 +47,7 @@ func (s *SqliteDB) InsertOrganization(organization model.Organization) (model.Or
 	return organization, nil
 }
 
-func (s *SqliteDB) InsertRepository(repository model.Repository) (model.Repository, error) {
+func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository, error) {
 	var err error
 	repository.UUID, err = uuid.NewV7()
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *SqliteDB) InsertRepository(repository model.Repository) (model.Reposito
 
 	for i := range repository.Branches {
 		repository.Branches[i].RepoID = repository.UUID
-		repository.Branches[i], err = s.InsertBranch(repository.Branches[i])
+		repository.Branches[i], err = s.SaveBranch(repository.Branches[i])
 		if err != nil {
 			return repository, err
 		}
@@ -85,7 +85,7 @@ func (s *SqliteDB) InsertRepository(repository model.Repository) (model.Reposito
 
 	for i := range repository.Environments {
 		repository.Environments[i].RepoID = repository.UUID
-		repository.Environments[i], err = s.InsertEnvironment(repository.Environments[i])
+		repository.Environments[i], err = s.SaveEnvironment(repository.Environments[i])
 		if err != nil {
 			return repository, err
 		}
@@ -94,7 +94,7 @@ func (s *SqliteDB) InsertRepository(repository model.Repository) (model.Reposito
 	return repository, nil
 }
 
-func (s *SqliteDB) InsertBranch(branch model.Branch) (model.Branch, error) {
+func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	insert := `INSERT INTO branches (
 		id, "name", created_at,
 		modified_at, latest_commit,
@@ -121,7 +121,7 @@ func (s *SqliteDB) InsertBranch(branch model.Branch) (model.Branch, error) {
 
 	for i := range branch.Commits {
 		branch.Commits[i].BranchID = branch.ID
-		branch.Commits[i], err = s.InsertCommit(branch.Commits[i])
+		branch.Commits[i], err = s.SaveCommit(branch.Commits[i])
 		if err != nil {
 			return branch, err
 		}
@@ -130,7 +130,7 @@ func (s *SqliteDB) InsertBranch(branch model.Branch) (model.Branch, error) {
 	return branch, nil
 }
 
-func (s *SqliteDB) InsertCommit(commit model.Commit) (model.Commit, error) {
+func (s *SqliteDB) SaveCommit(commit model.Commit) (model.Commit, error) {
 	insert := `INSERT INTO commits (
 		"hash", author, created_at, branch_id
 	) VALUES (
