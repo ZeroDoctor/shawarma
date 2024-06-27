@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS github_orgs (
     created_at         TEXT,
     updated_at         TEXT,
     archived_at        TEXT,
-    "type"             TEXT,
+    "type"             TEXT
 );
 
 CREATE TABLE IF NOT EXISTS github_owners (
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS github_owners (
     "url"             TEXT,
     organizations_url TEXT,
     repos_url         TEXT,
-    "type"            TEXT,
+    "type"            TEXT
 );
 
 CREATE TABLE IF NOT EXISTS github_users_orgs (
@@ -74,5 +74,5 @@ CREATE TABLE IF NOT EXISTS github_repos (
     open_issues_count INT,
     visibility        TEXT,
 
-    FOREIGN KEY(owner_id) REFERENCES github_owners(id),
+    FOREIGN KEY(owner_id) REFERENCES github_owners(id)
 );

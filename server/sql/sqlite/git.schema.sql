@@ -1,14 +1,3 @@
-CREATE TABLE IF NOT EXISTS organizations (
-    uuid        TEXT UNIQUE, -- yes I know
-    "owner"     TEXT,
-    "name"      TEXT,
-    avatar_url  TEXT,
-    created_at  INT,
-    modified_at INT,
-
-    PRIMARY KEY("owner", "name")
-);
-
 CREATE TABLE IF NOT EXISTS repositories (
     uuid        TEXT UNIQUE, -- hear me out
     "owner"     TEXT,
@@ -29,16 +18,15 @@ CREATE TABLE IF NOT EXISTS branches (
     created_at       INT,
     modified_at      INT,
 
-    latest_commit    TEXT,
-    repo_id          INT,
+    repo_id          TEXT,
 
-    FOREIGN KEY(repo_id) REFERENCES repositories(id),
-    FOREIGN KEY(latest_commit) REFERENCES commits("commit")
+    FOREIGN KEY(repo_id) REFERENCES repositories(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS commits (
     "hash"     TEXT PRIMARY KEY,
     author     TEXT,
+    "message"  TEXT,
     created_at INT,
 
     branch_id  INT,

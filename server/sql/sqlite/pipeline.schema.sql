@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS steps (
     "name"      TEXT,
     "image"     TEXT,
     commands    TEXT,
-    privileged  INT2,
-    detach      INT2,
+    privileged  INT,
+    detach      INT,
     created_at  INT,
     modified_at INT,
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS steps (
 CREATE TABLE IF NOT EXISTS environments (
     "key"       TEXT,
     "data"      TEXT,
-    protected   INT2,
+    protected   INT,
     created_at  INT,
     modified_at INT,
 

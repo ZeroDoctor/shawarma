@@ -4,27 +4,15 @@ import (
 	"time"
 )
 
-type Organization struct {
-	UUID       UUID      `db:"uuid"`
-	Owner      string    `db:"owner" json:"owner"`
-	Name       string    `db:"name" json:"name"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
-
-	Repositories []Repository  `json:"repository"`
-	Environments []Environment `json:"environments"`
-	Env          map[string]string
-}
-
 type Repository struct {
-	UUID       UUID      `db:"uuid"`
+	UUID       UUID      `db:"uuid" json:"uuid"`
 	Owner      string    `db:"owner" json:"owner"`
 	Name       string    `db:"name" json:"name"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time `db:"modified_at" json:"modified_at"`
 
-	OwnerType string `json:"owner_type"`
-	OwnerID   UUID   `db:"owner_id"`
+	OwnerType string `db:"owner_type" json:"owner_type"`
+	OwnerID   UUID   `db:"owner_id" json:"owner_id"`
 
 	Branches     []Branch      `json:"branches"`
 	Environments []Environment `json:"environments"`
@@ -32,13 +20,12 @@ type Repository struct {
 }
 
 type Branch struct {
-	ID         int       `db:"id"`
+	ID         int       `db:"id" json:"id"`
 	Name       string    `db:"name" json:"name"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time `db:"modified_at" json:"moified_at"`
 
-	LatestCommit string `db:"latest_commit" json:"latest_commit"`
-	RepoID       UUID   `db:"repo_id"`
+	RepoID UUID `db:"repo_id" json:"repo_id"`
 
 	Commits []Commit `json:"commits"`
 }
@@ -46,7 +33,8 @@ type Branch struct {
 type Commit struct {
 	Hash      string    `db:"commit" json:"hash"`
 	Author    string    `db:"author" json:"author"`
-	CreatedAt time.Time `db:"created_at"`
+	Message   string    `db:"message" json:"message"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 
-	BranchID int `db:"branch_id"`
+	BranchID int `db:"branch_id" json:"branch_id"`
 }

@@ -5,11 +5,11 @@ import (
 )
 
 type Runner struct {
-	UUID       UUID      `db:"uuid"`
-	Type       string    `db:"type"`
-	Hostname   string    `db:"hostname"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	UUID       UUID      `db:"uuid" json:"uuid"`
+	Type       string    `db:"type" json:"type"`
+	Hostname   string    `db:"hostname" json:"hostname"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time `db:"modified_at" json:"moified_at"`
 
-	Pipelines []Pipeline
+	Pipelines []Pipeline `json:"pipelines"`
 }

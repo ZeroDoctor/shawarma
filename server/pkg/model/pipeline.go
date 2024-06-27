@@ -99,55 +99,55 @@ func (c Commands) Value() (driver.Value, error) {
 }
 
 type Pipeline struct {
-	ID         int            `db:"id"`
-	Type       string         `db:"type"`
-	Status     PipelineStatus `db:"status"`
-	CreatedAt  time.Time      `db:"created_at"`
-	ModifiedAt time.Time      `db:"modified_at"`
+	ID         int            `db:"id" json:"id"`
+	Type       string         `db:"type" json:"type"`
+	Status     PipelineStatus `db:"status" json:"status"`
+	CreatedAt  time.Time      `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time      `db:"modified_at" json:"modified_at"`
 
-	RepoID   uuid.UUID `db:"repo_id"`
-	RunnerID uuid.UUID `db:"runner_id"`
+	RepoID   uuid.UUID `db:"repo_id" json:"repo_id"`
+	RunnerID uuid.UUID `db:"runner_id" json:"runner_id"`
 
-	Steps  []Step
-	Events []Event
+	Steps  []Step  `json:"steps"`
+	Events []Event `json:"events"`
 }
 
 type Step struct {
-	UUID       UUID      `db:"uuid"`
-	Name       string    `db:"name"`
-	Image      string    `db:"image"`
-	Commands   Commands  `db:"commands"`
-	Privileged bool      `db:"privileged"`
-	Detach     bool      `db:"detach"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	UUID       UUID      `db:"uuid" json:"uuid"`
+	Name       string    `db:"name" json:"name"`
+	Image      string    `db:"image" json:"image"`
+	Commands   Commands  `db:"commands" json:"commands"`
+	Privileged bool      `db:"privileged" json:"privileged"`
+	Detach     bool      `db:"detach" json:"detach"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time `db:"modified_at" json:"modified_at"`
 
-	PipelineID int `db:"pipeline_id"`
+	PipelineID int `db:"pipeline_id" json:"pipeline_id"`
 
-	Events []Event
+	Events []Event `json:"events"`
 }
 
 type Environment struct {
-	Key        string    `db:"key"`
-	Data       string    `db:"data"`
-	Protected  bool      `db:"protected"`
-	CreatedAt  time.Time `db:"created_at"`
-	ModifiedAt time.Time `db:"modified_at"`
+	Key        string    `db:"key" json:"key"`
+	Data       string    `db:"data" json:"data"`
+	Protected  bool      `db:"protected" json:"protected"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time `db:"modified_at" json:"modified_at"`
 
-	RepoID UUID `db:"repo_id"`
-	OrgID  UUID `db:"org_id"`
+	RepoID UUID `db:"repo_id" json:"repo_id"`
+	OrgID  UUID `db:"org_id" json:"org_id"`
 }
 
 type Event struct {
-	Webhook    string          `db:"webhook"`
-	Type       StatusEvent     `db:"type"`
-	StatusName StatusEventName `db:"status_name"`
-	Action     Action          `db:"action"`
-	Deadline   string          `db:"deadline"`
-	After      string          `db:"after"`
-	CreatedAt  time.Time       `db:"created_at"`
-	ModifiedAt time.Time       `db:"modified_at"`
+	Webhook    string          `db:"webhook" json:"webhook"`
+	Type       StatusEvent     `db:"type" json:"type"`
+	StatusName StatusEventName `db:"status_name" json:"status_name"`
+	Action     Action          `db:"action" json:"action"`
+	Deadline   string          `db:"deadline" json:"deadline"`
+	After      string          `db:"after" json:"after"`
+	CreatedAt  time.Time       `db:"created_at" json:"created_at"`
+	ModifiedAt time.Time       `db:"modified_at" json:"modified_at"`
 
-	PipelineID int  `db:"pipeline_id"`
-	StepID     UUID `db:"step_id"`
+	PipelineID int  `db:"pipeline_id" json:"pipeline_id"`
+	StepID     UUID `db:"step_id" json:"step_id"`
 }
