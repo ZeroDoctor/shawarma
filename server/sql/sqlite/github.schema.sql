@@ -98,5 +98,9 @@ CREATE TABLE IF NOT EXISTS github_commits (
 
 CREATE TABLE IF NOT EXISTS github_commit_parents (
     parent_sha TEXT,
-    child_sha  TEXT
+    child_sha  TEXT,
+
+    UNIQUE(parent_sha, child_sha),
+    FOREIGN KEY(parent_sha) REFERENCES github_commits(sha),
+    FOREIGN KEY(child_sha) REFERENCES github_commits(sha)
 )

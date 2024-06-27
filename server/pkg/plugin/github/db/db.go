@@ -109,14 +109,16 @@ func (s *DB) SaveGithubOwner(owner model.GithubOwner) (model.GithubOwner, error)
 	return owner, err
 }
 
-func (s *DB) SaveGithubRepo(repo model.GithubRepo) (model.GithubRepo, error) {
+func (s *DB) SaveGithubRepo(repos []model.GithubRepo) ([]model.GithubRepo, error) {
 	var err error
 
-	owner, err := s.SaveGithubOwner(repo.Owner)
-	if err != nil {
-		return repo, err
+	for i := range repos {
+		owner, err := s.SaveGithubOwner(repos[i].Owner)
+		if err != nil {
+			return repos, err
+		}
+		repos[i].OwnerID = owner.ID
 	}
-	repo.OwnerID = owner.ID
 
 	insert := `INSERT INTO github_repos (
 		id, owner_id, "name", full_name, "description",
@@ -154,6 +156,51 @@ func (s *DB) SaveGithubRepo(repo model.GithubRepo) (model.GithubRepo, error) {
 		open_issues_count = excluded.open_issues_count,
 		visibility        = excluded.visibility;`
 
-	_, err = s.conn.NamedExec(insert, repo)
-	return repo, err
+	_, err = s.conn.NamedExec(insert, repos)
+	return repos, err
+}
+
+func (s *DB) SaveGithubBranch(branch []model.GithubBranch) ([]model.GithubBranch, error) {
+
+	return branch, nil
+}
+
+func (s *DB) SaveGithubCommit(commits []model.GithubCommit) ([]model.GithubCommit, error) {
+	insert := `INSERT INTO github_commits (
+		sha, "message", "url"
+	) VALUES (
+		:sha, :message, :url
+	) ON CONFLICT (sha) DO NOTHING;`
+
+	_, err := s.conn.NamedExec(insert, commits)
+	if err != nil {
+		return commits, err
+	}
+
+	for i := range commits {
+		parentCommits, err := s.SaveGithubCommit(commits[i].Parents)
+		if err != nil {
+			return commits, err
+		}
+
+		for j := range parentCommits {
+			err = s.SaveGithubCommitParents(parentCommits[j].SHA, commits[i].SHA)
+			if err != nil {
+				return commits, err
+			}
+		}
+	}
+
+	return commits, err
+}
+
+func (s *DB) SaveGithubCommitParents(parentSHA string, childSHA string) error {
+	insert := `INSERT INTO github_commit_parents (
+		parent_sha, child_sha
+	) VALUES (
+		$1, $2
+	) ON CONFLICT (parent_sha, child_sha) DO NOTHING;`
+
+	_, err := s.conn.Exec(insert, parentSHA, childSHA)
+	return err
 }

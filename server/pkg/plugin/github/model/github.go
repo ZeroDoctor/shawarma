@@ -264,6 +264,7 @@ type GithubCommit struct {
 	Message   string             `json:"message,omitempty" db:"message"`
 	Tree      GithubTree         `json:"tree,omitempty"`
 	URL       string             `json:"url,omitempty" db:"url"`
+	Parents   []GithubCommit     `json:"parents,omitempty"`
 }
 
 type GithubCommitAuthor struct {

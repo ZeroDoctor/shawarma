@@ -278,14 +278,11 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 		repos = append(repos, orgRepos...)
 	}
 
-	for i := range repos {
-		repo, err := s.db.SaveGithubRepo(repos[i])
-		if err != nil {
-			return repos, fmt.Errorf("failed to save [user=%s] [owner=%s] repo [error=%w]",
-				user.Login, repos[i].Owner.Login, err,
-			)
-		}
-		repos[i] = repo
+	repos, err = s.db.SaveGithubRepo(repos)
+	if err != nil {
+		return repos, fmt.Errorf("failed to save [user=%s] repos [error=%w]",
+			user.Login, err,
+		)
 	}
 
 	return repos, nil
@@ -322,6 +319,33 @@ func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.
 	return repos, nil
 }
 
-func (s *GithubService) SaveGithubBranches(token string, branchesURL string) {
+func (s *GithubService) GetGithubBranches(token string, branchesURL string) ([]gmodel.GithubBranch, error) {
+	var branches []gmodel.GithubBranch
 
+	resps, err := NewRequest(httputils.GET, branchesURL, nil).
+		OptionGithubHeaders(token).
+		OptionGithubPages(100).
+		DoAll()
+	if err != nil {
+		return branches, fmt.Errorf("failed to do request [error=%w]", err)
+	}
+
+	for _, resp := range resps {
+		defer resp.Body.Close()
+
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return branches, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
+				branchesURL, err,
+			)
+		}
+
+		var tempBranches []gmodel.GithubBranch
+		if err := json.Unmarshal(data, &tempBranches); err != nil {
+			return branches, fmt.Errorf("failed to unmarshal data from github branches [error=%w]", err)
+		}
+		branches = append(branches, tempBranches...)
+	}
+
+	return branches, nil
 }
