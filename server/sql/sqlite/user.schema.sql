@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS organizations (
     created_at  INT,
     modified_at INT,
 
-    PRIMARY KEY("owner", "name")
+    PRIMARY KEY("name")
 );

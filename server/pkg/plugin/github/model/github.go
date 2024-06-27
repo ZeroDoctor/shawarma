@@ -1,7 +1,7 @@
 package model
 
 type GithubUser struct {
-	Login                   string     `json:"login,omitempty"`
+	Login                   string     `json:"login,omitempty" db:"name"`
 	ID                      int        `json:"id,omitempty" db:"id"`
 	NodeID                  string     `json:"node_id,omitempty"`
 	AvatarURL               string     `json:"avatar_url,omitempty" db:"avatar_url"`
@@ -19,7 +19,7 @@ type GithubUser struct {
 	ReceivedEventsURL       string     `json:"received_events_url,omitempty"`
 	Type                    string     `json:"type,omitempty" db:"type"`
 	SiteAdmin               bool       `json:"site_admin,omitempty"`
-	Name                    string     `json:"name,omitempty" db:"name"`
+	Name                    string     `json:"name,omitempty"`
 	Company                 string     `json:"company,omitempty" db:"company"`
 	Blog                    string     `blog:"blog,omitempty"`
 	Location                string     `json:"location,omitempty"`
@@ -104,7 +104,7 @@ type GithubUsersOrgs struct {
 }
 
 type GithubOrg struct {
-	Login                                string     `json:"login,omitempty"`
+	Login                                string     `json:"login,omitempty" db:"name"`
 	ID                                   int        `json:"id,omitempty" db:"id"`
 	NodeID                               string     `json:"node_id,omitempty"`
 	URL                                  string     `json:"url,omitempty" db:"url"`
@@ -116,7 +116,7 @@ type GithubOrg struct {
 	PublicMembersURL                     string     `json:"public_members_url,omitempty" db:"public_members_url"`
 	AvatarURL                            string     `json:"avatar_url,omitempty" db:"avatar_url"`
 	Description                          string     `json:"description,omitempty" db:"description"`
-	Name                                 string     `json:"name,omitempty" db:"name"`
+	Name                                 string     `json:"name,omitempty"`
 	Company                              string     `json:"company,omitempty" db:"company"`
 	Blog                                 string     `json:"blog,omitempty"`
 	Location                             string     `json:"location,omitempty"`
@@ -239,4 +239,40 @@ type GithubLicense struct {
 	SPDXID string `json:"spdx_id,omitempty"`
 	URL    string `json:"url,omitempty"`
 	NodeID string `json:"node_id,omitempty"`
+}
+
+type GithubBranch struct {
+	Name          string         `json:"name,omitempty" db:"name"`
+	Commit        GithubCommit   `json:"commit,omitempty"`
+	URL           string         `json:"url,omitempty" db:"url"`
+	HtmlURL       string         `json:"html_url,omitempty"`
+	CommentsURL   string         `json:"comments_url,omitempty"`
+	Author        GithubOwner    `json:"author,omitempty"`
+	AuthorID      int            `db:"author_id"`
+	Committer     GithubOwner    `json:"committer,omitempty"`
+	CommitterID   int            `db:"committer_id"`
+	Parents       []GithubCommit `json:"parents,omitempty"`
+	Protected     bool           `json:"protected,omitempty"`
+	ProtectionURL string         `json:"protection_url,omitempty"`
+}
+
+type GithubCommit struct {
+	SHA       string             `json:"sha,omitempty" db:"sha"`
+	NodeID    string             `json:"node_id,omitempty"`
+	Author    GithubCommitAuthor `json:"author,omitempty"`
+	Committer GithubCommitAuthor `json:"committer,omitempty"`
+	Message   string             `json:"message,omitempty" db:"message"`
+	Tree      GithubTree         `json:"tree,omitempty"`
+	URL       string             `json:"url,omitempty" db:"url"`
+}
+
+type GithubCommitAuthor struct {
+	Name  string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
+	Date  string `json:"date,omitempty"`
+}
+
+type GithubTree struct {
+	SHA string `json:"sha,omitempty"`
+	URL string `json:"url,omitempty"`
 }

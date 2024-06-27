@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS repositories (
-    uuid        TEXT UNIQUE, -- hear me out
-    "owner"     TEXT,
-    "name"      TEXT,
-    active      INT,
-    created_at  INT,
-    modified_at INT,
-
-    owner_type  TEXT, -- either user || organization
-    owner_id    TEXT,
+    uuid           TEXT UNIQUE, -- hear me out
+    "owner"        TEXT,
+    "name"         TEXT,
+    default_branch TEXT,
+    active         INT,
+    created_at     INT,
+    modified_at    INT,
+    owner_type     TEXT, -- either user || organization
+    owner_id       TEXT,
 
     PRIMARY KEY("owner", "name")
 );

@@ -5,48 +5,6 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Organization, error) {
-	id, err := uuid.NewV7()
-	if err != nil {
-		return organization, err
-	}
-	organization.UUID = model.UUID(id)
-
-	insert := `INSERT INTO organizations (
-		uuid, "owner", "name", created_at, modified_at
-	) VALUES (
-		:uuid, :owner, :name, :created_at, :modified_at
-	) ON CONFLICT ("owner", "name") DO UPDATE SET 
-		uuid        = excluded.uuid, 
-		"owner"     = excluded.owner, 
-		"name"      = excluded.name, 
-		created_at  = excluded.created_at, 
-		modified_at = excluded.modified_at
-	;`
-
-	if _, err = s.conn.NamedExec(insert, organization); err != nil {
-		return organization, err
-	}
-
-	for i := range organization.Repositories {
-		organization.Repositories[i].OwnerID = organization.UUID
-		organization.Repositories[i], err = s.SaveRepository(organization.Repositories[i])
-		if err != nil {
-			return organization, err
-		}
-	}
-
-	for i := range organization.Environments {
-		organization.Environments[i].OrgID = organization.UUID
-		organization.Environments[i], err = s.SaveEnvironment(organization.Environments[i])
-		if err != nil {
-			return organization, err
-		}
-	}
-
-	return organization, nil
-}
-
 func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -56,19 +14,20 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 
 	insert := `INSERT INTO repositories (
 		uuid, "owner", "name", 
-		created_at, modified_at,
-		org_id
+		default_branch, owner_type,
+		owner_id, created_at, modified_at
 	) VALUES (
 		:uuid, :owner, :name, 
-		:created_at, :modified_at,
-		:org_id
+		:default_branch, :owner_type,
+		:owner_id, :created_at, :modified_at
 	) ON CONFLICT ("owner", "name") DO UPDATE SET 
-		uuid        = excluded.uuid, 
-		"owner"     = excluded.owner, 
-		"name"      = excluded.name, 
-		created_at  = excluded.created_at, 
-		modified_at = excluded.modified_at,
-		org_id      = excluded.org_id
+		uuid           = excluded.uuid, 
+		"owner"        = excluded.owner, 
+		"name"         = excluded.name, 
+		default_branch = excluded.default_branch,
+ 		owner_type     = excluded.owner_type,
+		created_at     = excluded.created_at, 
+		modified_at    = excluded.modified_at
 	;`
 
 	if _, err = s.conn.NamedExec(insert, repository); err != nil {

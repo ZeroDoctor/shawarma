@@ -76,3 +76,27 @@ CREATE TABLE IF NOT EXISTS github_repos (
 
     FOREIGN KEY(owner_id) REFERENCES github_owners(id)
 );
+
+CREATE TABLE IF NOT EXISTS github_branches (
+    "name"       TEXT,
+    "url"        TEXT,
+    author_id    INT,
+    committer_id INT,
+    repo_id      INT,
+    sha          TEXT,
+
+    FOREIGN KEY(sha) REFERENCES github_commits(sha)
+    FOREIGN KEY(repo_id) REFERENCES github_repos(id)
+    PRIMARY KEY(repo_id, "name")
+);
+
+CREATE TABLE IF NOT EXISTS github_commits (
+    sha       TEXT PRIMARY KEY,
+    "message" TEXT,
+    "url"     TEXT
+);
+
+CREATE TABLE IF NOT EXISTS github_commit_parents (
+    parent_sha TEXT,
+    child_sha  TEXT
+)

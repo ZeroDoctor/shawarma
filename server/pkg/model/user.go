@@ -21,6 +21,7 @@ type Organization struct {
 	UUID       UUID      `db:"uuid"`
 	Owner      string    `db:"owner" json:"owner"`
 	Name       string    `db:"name" json:"name"`
+	AvatarURL  string    `db:"avatar_url" json:"avatar_url"`
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 

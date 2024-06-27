@@ -56,8 +56,28 @@ func (s *GithubService) RegisterUser(details map[string]interface{}) (model.User
 	if err != nil {
 		return user, err
 	}
-	user.Name = githubUser.Name
+	user.Name = githubUser.Login
 	user.AvatarURL = githubUser.AvatarURL
+
+	var orgs []model.Organization
+	for i := range githubUser.Orgs {
+		orgs = append(orgs, model.Organization{
+			Name:      githubUser.Orgs[i].Login,
+			AvatarURL: githubUser.Orgs[i].AvatarURL,
+		})
+	}
+	user.Organizations = orgs
+
+	var repos []model.Repository
+	for i := range githubUser.Repos {
+		repos = append(repos, model.Repository{
+			Name:          githubUser.Repos[i].Name,
+			Owner:         githubUser.Repos[i].Owner.Login,
+			OwnerType:     githubUser.Repos[i].Owner.Type,
+			DefaultBranch: githubUser.Repos[i].DefaultBranch,
+		})
+	}
+	user.Repositories = repos
 
 	return user, nil
 }
@@ -146,6 +166,7 @@ func (s *GithubService) GetGithubAuthUser(token string) (gmodel.GithubUser, erro
 
 func (s *GithubService) RegisterUserOrganizations(token string, user model.User) ([]model.Organization, error) {
 	var orgs []model.Organization
+	// TODO: implementation
 	return orgs, nil
 }
 
@@ -166,7 +187,7 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 		}
 		org, err = s.db.SaveGithubUserOrg(user.ID, org)
 		if err != nil {
-			return githubOrgs, fmt.Errorf("failed to save [org=%s] [error=%w]", org.Name, err)
+			return githubOrgs, fmt.Errorf("failed to save [org=%s] [error=%w]", org.Login, err)
 		}
 		githubOrgs = append(githubOrgs, org)
 	}
@@ -234,6 +255,7 @@ func (s *GithubService) GetGithubOrg(token string, orgURL string) (gmodel.Github
 
 func (s *GithubService) RegisterUserRepositories(token string, user model.User) ([]model.Repository, error) {
 	var repos []model.Repository
+	// TODO: implementation
 	return repos, nil
 }
 
@@ -242,7 +264,7 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 
 	userRepos, err := s.GetGithubRepos(token, user.ReposURL)
 	if err != nil {
-		return repos, fmt.Errorf("failed to fetch [user=%s] repos [error=%w]", user.Name, err)
+		return repos, fmt.Errorf("failed to fetch [user=%s] repos [error=%w]", user.Login, err)
 	}
 	repos = append(repos, userRepos...)
 
@@ -250,7 +272,7 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 		orgRepos, err := s.GetGithubRepos(token, user.Orgs[i].ReposURL)
 		if err != nil {
 			return repos, fmt.Errorf("failed to fetch [user=%s] [org=%s] repos [error=%w]",
-				user.Name, user.Orgs[i].Name, err,
+				user.Login, user.Orgs[i].Login, err,
 			)
 		}
 		repos = append(repos, orgRepos...)
@@ -260,7 +282,7 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 		repo, err := s.db.SaveGithubRepo(repos[i])
 		if err != nil {
 			return repos, fmt.Errorf("failed to save [user=%s] [owner=%s] repo [error=%w]",
-				user.Name, repos[i].Owner.Login, err,
+				user.Login, repos[i].Owner.Login, err,
 			)
 		}
 		repos[i] = repo
@@ -298,4 +320,8 @@ func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.
 	}
 
 	return repos, nil
+}
+
+func (s *GithubService) SaveGithubBranches(token string, branchesURL string) {
+
 }
