@@ -6,11 +6,11 @@ import (
 )
 
 func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Organization, error) {
-	var err error
-	organization.UUID, err = uuid.NewV7()
+	id, err := uuid.NewV7()
 	if err != nil {
 		return organization, err
 	}
+	organization.UUID = model.UUID(id)
 
 	insert := `INSERT INTO organizations (
 		uuid, "owner", "name", created_at, modified_at
@@ -29,7 +29,7 @@ func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Orga
 	}
 
 	for i := range organization.Repositories {
-		organization.Repositories[i].OrgID = organization.UUID
+		organization.Repositories[i].OwnerID = organization.UUID
 		organization.Repositories[i], err = s.SaveRepository(organization.Repositories[i])
 		if err != nil {
 			return organization, err
@@ -48,11 +48,11 @@ func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Orga
 }
 
 func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository, error) {
-	var err error
-	repository.UUID, err = uuid.NewV7()
+	id, err := uuid.NewV7()
 	if err != nil {
 		return repository, err
 	}
+	repository.UUID = model.UUID(id)
 
 	insert := `INSERT INTO repositories (
 		uuid, "owner", "name", 

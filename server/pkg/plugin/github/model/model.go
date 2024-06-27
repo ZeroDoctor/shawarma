@@ -14,7 +14,7 @@ func (t *Time) Scan(src interface{}) error {
 		return nil
 	}
 
-	return fmt.Errorf("unexcepted format [src=%T] wanted type int64", src)
+	return fmt.Errorf("unexcepted format [Time=%T] wanted type int64", src)
 }
 
 func (t Time) Value() (driver.Value, error) {

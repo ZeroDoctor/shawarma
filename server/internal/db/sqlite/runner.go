@@ -6,11 +6,11 @@ import (
 )
 
 func (s *SqliteDB) SaveRunner(runner model.Runner) (model.Runner, error) {
-	var err error
-	runner.UUID, err = uuid.NewV7()
+	id, err := uuid.NewV7()
 	if err != nil {
 		return runner, err
 	}
+	runner.UUID = model.UUID(id)
 
 	insert := `INSERT INTO runners (
 		uuid, "type", hostname, 

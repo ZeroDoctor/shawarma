@@ -60,7 +60,7 @@ func NewStep(pipelineID int, step config.Step) model.Step {
 	}
 
 	return model.Step{
-		UUID:       uuid.New(),
+		UUID:       model.UUID(uuid.New()),
 		Name:       step.Name,
 		Image:      step.Image,
 		Commands:   step.Commands,

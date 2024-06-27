@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS organizations (
     uuid        TEXT UNIQUE, -- yes I know
     "owner"     TEXT,
     "name"      TEXT,
+    avatar_url  TEXT,
     created_at  INT,
     modified_at INT,
 
@@ -16,9 +17,9 @@ CREATE TABLE IF NOT EXISTS repositories (
     created_at  INT,
     modified_at INT,
 
-    org_id      TEXT,
+    owner_type  TEXT, -- either user || organization
+    owner_id    TEXT,
 
-    FOREIGN KEY(org_id) REFERENCES organizations(uuid),
     PRIMARY KEY("owner", "name")
 );
 

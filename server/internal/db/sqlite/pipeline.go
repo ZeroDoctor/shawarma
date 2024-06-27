@@ -50,11 +50,11 @@ func (s *SqliteDB) SavePipeline(pipeline model.Pipeline) (model.Pipeline, error)
 }
 
 func (s *SqliteDB) SaveStep(step model.Step) (model.Step, error) {
-	var err error
-	step.UUID, err = uuid.NewV7()
+	id, err := uuid.NewV7()
 	if err != nil {
 		return step, err
 	}
+	step.UUID = model.UUID(id)
 
 	insert := `INSERT INTO steps (
 		uuid, "name", "image", 

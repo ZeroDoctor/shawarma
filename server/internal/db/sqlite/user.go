@@ -35,26 +35,33 @@ func (s *SqliteDB) QueryUserByName(name string) (model.User, error) {
 }
 
 func (s *SqliteDB) SaveUser(user model.User) (model.User, error) {
-	var err error
-
-	session, err := uuid.NewV7()
+	id, err := uuid.NewV7()
 	if err != nil {
 		return user, err
 	}
-	user.Session = session.String()
+	user.UUID = model.UUID(id)
+
+	id, err = uuid.NewV7()
+	if err != nil {
+		return user, err
+	}
+	user.Session = model.UUID(id)
 
 	now := time.Now()
 	user.CreatedAt = now
 	user.ModifiedAt = now
 
 	insert := `INSERT INTO users (
-		"name", "session",
-		created_at, modified_at
+		uuid, "name", "session", avatar_url,
+		git_remote, created_at, modified_at
 	) VALUES (
-		:name, :session,
-		:created_at, :modified_at
+		:uuid, :name, :session, :avatar_url,
+		:git_remote, :created_at, :modified_at
 	) ON CONFLICT("name") DO UPDATE SET
+		uuid        = excluded.uuid,
 		session     = excluded.session,
+		avatar_url  = excluded.avatar_url,
+		git_remote  = excluded.git_remote,
 		modified_at = excluded.modified_at,
 		created_at  = excluded.created_at
 	;`

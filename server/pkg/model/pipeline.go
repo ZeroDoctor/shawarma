@@ -113,7 +113,7 @@ type Pipeline struct {
 }
 
 type Step struct {
-	UUID       uuid.UUID `db:"uuid"`
+	UUID       UUID      `db:"uuid"`
 	Name       string    `db:"name"`
 	Image      string    `db:"image"`
 	Commands   Commands  `db:"commands"`
@@ -134,8 +134,8 @@ type Environment struct {
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
-	RepoID uuid.UUID `db:"repo_id"`
-	OrgID  uuid.UUID `db:"org_id"`
+	RepoID UUID `db:"repo_id"`
+	OrgID  UUID `db:"org_id"`
 }
 
 type Event struct {
@@ -148,6 +148,6 @@ type Event struct {
 	CreatedAt  time.Time       `db:"created_at"`
 	ModifiedAt time.Time       `db:"modified_at"`
 
-	PipelineID int       `db:"pipeline_id"`
-	StepID     uuid.UUID `db:"step_id"`
+	PipelineID int  `db:"pipeline_id"`
+	StepID     UUID `db:"step_id"`
 }

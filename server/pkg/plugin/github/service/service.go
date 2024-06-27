@@ -15,13 +15,6 @@ import (
 const (
 	GITHUB_API_VERSION string = "2022-11-28"
 	GITHUB_API_ACCEPT  string = "application/vnd.github+json"
-
-	HTTP_GET     string = "GET"
-	HTTP_POST    string = "POST"
-	HTTP_PUT     string = "PUT"
-	HTTP_OPTIONS string = "OPTIONS"
-	HTTP_PATCH   string = "PATCH"
-	HTTP_DELETE  string = "DELETE"
 )
 
 var (

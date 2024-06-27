@@ -6,6 +6,9 @@ import (
 )
 
 type GitRemote interface {
-	RegisterUser(map[string]interface{}) (model.User, error)
 	Setup(db db.DB)
+
+	RegisterUser(map[string]interface{}) (model.User, error)
+	RegisterUserOrganizations(token string, user model.User) ([]model.Organization, error)
+	RegisterUserRepositories(token string, user model.User) ([]model.Repository, error)
 }

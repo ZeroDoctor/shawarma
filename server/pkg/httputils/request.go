@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	HTTP_GET     string = "GET"
-	HTTP_POST    string = "POST"
-	HTTP_PUT     string = "PUT"
-	HTTP_OPTIONS string = "OPTIONS"
-	HTTP_PATCH   string = "PATCH"
-	HTTP_DELETE  string = "DELETE"
+	GET     string = "GET"
+	POST    string = "POST"
+	PUT     string = "PUT"
+	OPTIONS string = "OPTIONS"
+	PATCH   string = "PATCH"
+	DELETE  string = "DELETE"
 )
 
 type Request struct {

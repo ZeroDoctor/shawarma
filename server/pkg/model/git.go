@@ -2,12 +2,10 @@ package model
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Organization struct {
-	UUID       uuid.UUID `db:"uuid"`
+	UUID       UUID      `db:"uuid"`
 	Owner      string    `db:"owner" json:"owner"`
 	Name       string    `db:"name" json:"name"`
 	CreatedAt  time.Time `db:"created_at"`
@@ -19,13 +17,14 @@ type Organization struct {
 }
 
 type Repository struct {
-	UUID       uuid.UUID `db:"uuid"`
+	UUID       UUID      `db:"uuid"`
 	Owner      string    `db:"owner" json:"owner"`
 	Name       string    `db:"name" json:"name"`
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
-	OrgID uuid.UUID `db:"org_id"`
+	OwnerType string `json:"owner_type"`
+	OwnerID   UUID   `db:"owner_id"`
 
 	Branches     []Branch      `json:"branches"`
 	Environments []Environment `json:"environments"`
@@ -38,8 +37,8 @@ type Branch struct {
 	CreatedAt  time.Time `db:"created_at"`
 	ModifiedAt time.Time `db:"modified_at"`
 
-	LatestCommit string    `db:"latest_commit" json:"latest_commit"`
-	RepoID       uuid.UUID `db:"repo_id"`
+	LatestCommit string `db:"latest_commit" json:"latest_commit"`
+	RepoID       UUID   `db:"repo_id"`
 
 	Commits []Commit `json:"commits"`
 }

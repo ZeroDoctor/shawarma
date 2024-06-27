@@ -1,10 +1,16 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zerodoctor/shawarma/pkg/model"
+)
+
+var (
+	ErrRemoteTypeNotFound error = errors.New("failed to find 'type' field in request")
+	ErrInvalidRemoteType  error = errors.New("failed to find 'type' field as string in request")
 )
 
 func (api *API) registerUser(ctx *gin.Context) {
@@ -14,8 +20,19 @@ func (api *API) registerUser(ctx *gin.Context) {
 		badRequestError(ctx, err)
 		return
 	}
+	iRemoteType, ok := registerDetails["type"]
+	if !ok {
+		log.Warnf(ErrRemoteTypeNotFound.Error())
+		badRequestError(ctx, ErrRemoteTypeNotFound)
+	}
 
-	user, err := api.gitRemote.RegisterUser(registerDetails)
+	remoteType, ok := iRemoteType.(string)
+	if !ok {
+		log.Warnf(ErrInvalidRemoteType.Error())
+		badRequestError(ctx, ErrInvalidRemoteType)
+	}
+
+	user, err := api.service.RegisterUser(remoteType, registerDetails)
 	if err != nil {
 		internalError(ctx, err)
 		return

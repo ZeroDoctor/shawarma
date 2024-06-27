@@ -16,8 +16,8 @@ run:
 	@echo running server...
 	./shawarma
 
-.PHONY: dev
-dev:
+.PHONY: ui 
+ui:
 	@echo running ui...
 	cd ui && \
-	npm run dev
+	npm run dev &
