@@ -31,7 +31,7 @@ type GithubService struct {
 	db *gdb.DB
 }
 
-func NewService() *GithubService {
+func NewGithubService() *GithubService {
 	return &GithubService{}
 }
 

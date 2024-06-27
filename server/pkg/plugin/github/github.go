@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	remote.Register("github", service.NewService())
+	remote.Register("github", service.NewGithubService())
 }
