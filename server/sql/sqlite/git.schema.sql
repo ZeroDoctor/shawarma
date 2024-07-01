@@ -15,11 +15,13 @@ CREATE TABLE IF NOT EXISTS repositories (
 CREATE TABLE IF NOT EXISTS branches (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     "name"           TEXT,
+    "hash"           TEXT,
     created_at       INT,
     modified_at      INT,
 
     repo_id          TEXT,
 
+    FOREIGN KEY("hash") REFERENCES commits("hash")
     FOREIGN KEY(repo_id) REFERENCES repositories(uuid)
 );
 
@@ -28,9 +30,14 @@ CREATE TABLE IF NOT EXISTS commits (
     author     TEXT,
     "message"  TEXT,
     created_at INT,
+);
 
-    branch_id  INT,
+CREATE TABLE IF NOT EXISTS commit_parents (
+    parent_hash TEXT,
+    child_hash  TEXT,
 
-    FOREIGN KEY(branch_id) REFERENCES branches(id)
+    UNIQUE(parent_hash, child_hash),
+    FOREIGN KEY(parent_hash) REFERENCES commits("hash"),
+    FOREIGN KEY(child_hash) REFERENCES commits("hash")
 );
 

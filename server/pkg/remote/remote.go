@@ -5,10 +5,11 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-type GitRemote interface {
-	Setup(db db.DB)
+type GitRemoteDriver interface {
+	Setup(db.DB)
 
 	RegisterUser(map[string]interface{}) (model.User, error)
-	RegisterUserOrganizations(token string, user model.User) ([]model.Organization, error)
-	RegisterUserRepositories(token string, user model.User) ([]model.Repository, error)
+	RegisterUserOrganizations(model.User) ([]model.Organization, error)
+	RegisterUserRepositories(model.User) ([]model.Repository, error)
+	GetCommitsURL(model.User, []string) ([]model.Commit, error)
 }

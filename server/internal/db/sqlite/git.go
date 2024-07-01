@@ -55,13 +55,11 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 
 func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	insert := `INSERT INTO branches (
-		id, "name", created_at,
-		modified_at, latest_commit,
-		repo_id
+		id, "name", "hash:, created_at,
+		modified_at, repo_id
 	) VALUES (
-		:id, :name, :created_at,
-		:modified_at, :latest_commit,
-		:repo_id
+		:id, :name, :hash, :created_at,
+		:modified_at, :repo_id
 	) RETURNING id;`
 
 	rows, err := s.conn.NamedQuery(insert, branch)
@@ -79,7 +77,6 @@ func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	branch.ID = id
 
 	for i := range branch.Commits {
-		branch.Commits[i].BranchID = branch.ID
 		branch.Commits[i], err = s.SaveCommit(branch.Commits[i])
 		if err != nil {
 			return branch, err

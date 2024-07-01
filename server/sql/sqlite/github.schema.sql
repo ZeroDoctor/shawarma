@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS github_owners (
 );
 
 CREATE TABLE IF NOT EXISTS github_users_orgs (
-    user_id INT,
-    org_id  INT,
-    created_at     INT,
+    user_id    INT,
+    org_id     INT,
+    created_at INT,
 
     PRIMARY KEY(user_id, org_id),
     FOREIGN KEY(user_id) REFERENCES github_users(id),
@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS github_repos (
     archived          INT,
     open_issues_count INT,
     visibility        TEXT,
+    default_branch    TEXT,
 
     FOREIGN KEY(owner_id) REFERENCES github_owners(id)
 );
@@ -85,8 +86,8 @@ CREATE TABLE IF NOT EXISTS github_branches (
     repo_id      INT,
     sha          TEXT,
 
-    FOREIGN KEY(sha) REFERENCES github_commits(sha)
-    FOREIGN KEY(repo_id) REFERENCES github_repos(id)
+    FOREIGN KEY(sha) REFERENCES github_commits(sha),
+    FOREIGN KEY(repo_id) REFERENCES github_repos(id),
     PRIMARY KEY(repo_id, "name")
 );
 

@@ -1,11 +1,14 @@
 package db
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/zerodoctor/shawarma/pkg/plugin/github/model"
 )
+
+var ErrUserNotFound error = errors.New("user not found")
 
 type DB struct {
 	dbType string
@@ -17,6 +20,17 @@ func NewDB(dbType string, conn *sqlx.DB) *DB {
 		dbType: dbType,
 		conn:   conn,
 	}
+}
+
+func (s *DB) GetGithubUserByName(user model.GithubUser) ([]model.GithubUser, error) {
+	var users []model.GithubUser
+	query := `SELECT * FROM github_users WHERE "name" = ?`
+	err := s.conn.Select(&users, query, user.Name)
+	if len(users) <= 0 {
+		return users, ErrUserNotFound
+	}
+
+	return users, err
 }
 
 func (s *DB) SaveGithubAuthUser(user model.GithubUser) (model.GithubUser, error) {
@@ -34,6 +48,13 @@ func (s *DB) SaveGithubAuthUser(user model.GithubUser) (model.GithubUser, error)
 
 	_, err = s.conn.NamedExec(insert, user)
 	return user, err
+}
+
+func (s *DB) GetGithubOrgByUserID(user model.GithubUser) ([]model.GithubUser, error) {
+	var users []model.GithubUser
+	query := `SELECT * FROM github_users_orgs WHERE id = ?`
+	err := s.conn.Select(&users, query, user.ID)
+	return users, err
 }
 
 func (s *DB) SaveGithubUserOrg(userID int, org model.GithubOrg) (model.GithubOrg, error) {
@@ -125,13 +146,15 @@ func (s *DB) SaveGithubRepo(repos []model.GithubRepo) ([]model.GithubRepo, error
 		"url", collaborators_url, hooks_url, issue_events_url,
 		branches_url, tags_url, statuses_url, commits_url,
 		merges_url, issues_url, pulls_url, created_at, updated_at,
-		pushed_at, has_issues, archived, open_issues_count, visibility
+		pushed_at, has_issues, archived, open_issues_count, visibility,
+		default_branch
 	) VALUES (
 		:id, :owner_id, :name, :full_name, :description,
 		:url, :collaborators_url, :hooks_url, :issue_events_url,
 		:branches_url, :tags_url, :statuses_url, :commits_url,
 		:merges_url, :issues_url, :pulls_url, :created_at, :updated_at,
-		:pushed_at, :has_issues, :archived, :open_issues_count, :visibility
+		:pushed_at, :has_issues, :archived, :open_issues_count, :visibility,
+		:default_branch
 	) ON CONFLICT (id) DO UPDATE SET
 		owner_id          = excluded.owner_id,
 		"name"            = excluded.name,
@@ -154,23 +177,49 @@ func (s *DB) SaveGithubRepo(repos []model.GithubRepo) ([]model.GithubRepo, error
 		has_issues        = excluded.has_issues,
 		archived          = excluded.archived,
 		open_issues_count = excluded.open_issues_count,
-		visibility        = excluded.visibility;`
+		visibility        = excluded.visibility,
+		default_branch    = excluded.default_branch;`
 
 	_, err = s.conn.NamedExec(insert, repos)
 	return repos, err
 }
 
-func (s *DB) SaveGithubBranch(branch []model.GithubBranch) ([]model.GithubBranch, error) {
+func (s *DB) SaveGithubBranches(branches []model.GithubBranch) ([]model.GithubBranch, error) {
+	var commits []model.GithubCommit
+	for i := range branches {
+		commits = append(commits, branches[i].Commit)
+		branches[i].SHA = branches[i].Commit.SHA
+	}
 
-	return branch, nil
+	if _, err := s.SaveGithubCommits(commits); err != nil {
+		return branches, err
+	}
+
+	insert := `INSERT INTO github_branches (
+		"name", "url", author_id, 
+		committer_id, repo_id, sha
+	) VALUES (
+		:name, :url, :author_id, 
+		:committer_id, :repo_id, :sha
+	) ON CONFLICT (repo_id, "name") DO UPDATE SET
+		"url"        = excluded.url,
+		author_id    = excluded.author_id,
+		committer_id = excluded.committer_id,
+		sha          = excluded.sha;`
+
+	_, err := s.conn.NamedExec(insert, branches)
+	return branches, err
 }
 
-func (s *DB) SaveGithubCommit(commits []model.GithubCommit) ([]model.GithubCommit, error) {
+func (s *DB) SaveGithubCommits(commits []model.GithubCommit) ([]model.GithubCommit, error) {
 	insert := `INSERT INTO github_commits (
 		sha, "message", "url"
 	) VALUES (
 		:sha, :message, :url
-	) ON CONFLICT (sha) DO NOTHING;`
+	) ON CONFLICT (sha) DO UPDATE SET
+		"message" = excluded.message,
+		"url"     = excluded.url
+	;`
 
 	_, err := s.conn.NamedExec(insert, commits)
 	if err != nil {
@@ -178,7 +227,7 @@ func (s *DB) SaveGithubCommit(commits []model.GithubCommit) ([]model.GithubCommi
 	}
 
 	for i := range commits {
-		parentCommits, err := s.SaveGithubCommit(commits[i].Parents)
+		parentCommits, err := s.SaveGithubCommits(commits[i].Parents)
 		if err != nil {
 			return commits, err
 		}

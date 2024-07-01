@@ -8,13 +8,16 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/zerodoctor/shawarma/pkg/httputils"
 )
 
 const (
-	GITHUB_API_VERSION string = "2022-11-28"
-	GITHUB_API_ACCEPT  string = "application/vnd.github+json"
+	GITHUB_API_VERSION    string = "2022-11-28"
+	GITHUB_API_ACCEPT     string = "application/vnd.github+json"
+	GITHUB_RATE_REMAINING string = "x-ratelimit-remaining"
+	GITHUB_RATE_RESET     string = "x-ratelimit-reset"
 )
 
 var (
@@ -22,11 +25,26 @@ var (
 	ErrPaginationArgsNotSet error = errors.New("arguments not set for github pagination")
 )
 
-type GithubRequest struct {
-	*httputils.Request
+type GithubRequestLimiter struct {
+	*httputils.RequestLimiter
 }
 
-func NewRequest(method, u string, body io.Reader) *GithubRequest {
+func NewRequestLimiter() *GithubRequestLimiter {
+	return &GithubRequestLimiter{
+		RequestLimiter: httputils.NewRequestLimiter(NextRequestTime),
+	}
+}
+
+func NextRequestTime(resp *http.Response) time.Duration {
+	remaining := resp.Header.Get(GITHUB_RATE_REMAINING)
+	if remaining == "" {
+		return 0
+	}
+
+	return 0
+}
+
+func (grl *GithubRequestLimiter) NewRequest(method, u string, body io.Reader) *GithubRequest {
 	uri, err := url.Parse(u)
 	if err != nil {
 		return &GithubRequest{
@@ -45,6 +63,10 @@ func NewRequest(method, u string, body io.Reader) *GithubRequest {
 	}
 
 	return grequest.OptionGithubPagination()
+}
+
+type GithubRequest struct {
+	*httputils.Request
 }
 
 func (r *GithubRequest) OptionGithubHeaders(token string) *GithubRequest {
@@ -90,11 +112,11 @@ func (r *GithubRequest) OptionGithubPagination() *GithubRequest {
 		return r
 	}
 
-	if r.Next != nil {
+	if r.NextPage != nil {
 		return r
 	}
 
-	r.Next = func(args ...interface{}) (string, bool, error) {
+	r.NextPage = func(args ...interface{}) (string, bool, error) {
 		if len(args) <= 0 {
 			return "", false, ErrPaginationArgsNotSet
 		}

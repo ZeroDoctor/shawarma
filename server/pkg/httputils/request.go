@@ -1,10 +1,12 @@
 package httputils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const (
@@ -16,17 +18,48 @@ const (
 	DELETE  string = "DELETE"
 )
 
-type Request struct {
-	Uri     *url.URL
-	Method  string
-	Body    io.Reader
-	Headers map[string]string
+var (
+	ErrNextPageFuncUndefined error = errors.New("next page function undefined")
+)
 
-	Next func(args ...interface{}) (string, bool, error)
-	Err  error
+type RequestLimiter struct {
+	totalRequest    int
+	nextRequestTime func(*http.Response) time.Duration
+	prevResponse    *http.Response
 }
 
-func NewRequest(method, u string, body io.Reader) *Request {
+func NewRequestLimiter(next func(*http.Response) time.Duration) *RequestLimiter {
+	rl := &RequestLimiter{
+		totalRequest:    0,
+		nextRequestTime: next,
+	}
+
+	if next == nil {
+		rl.nextRequestTime = func(*http.Response) time.Duration {
+			rl.totalRequest++
+			return 0 * time.Second
+		}
+	}
+
+	return rl
+}
+
+func (rl *RequestLimiter) NextRequestTime(resp *http.Response) time.Duration {
+	if resp == nil {
+		return 0
+	}
+
+	if rl.nextRequestTime == nil {
+		rl.nextRequestTime = func(*http.Response) time.Duration {
+			rl.totalRequest++
+			return 0 * time.Second
+		}
+	}
+
+	return rl.nextRequestTime(resp)
+}
+
+func (rl *RequestLimiter) NewRequest(method, u string, body io.Reader) *Request {
 	uri, err := url.Parse(u)
 	if err != nil {
 		return &Request{
@@ -38,7 +71,21 @@ func NewRequest(method, u string, body io.Reader) *Request {
 		Uri:    uri,
 		Method: method,
 		Body:   body,
+
+		limiter: rl,
 	}
+}
+
+type Request struct {
+	Uri     *url.URL
+	Method  string
+	Body    io.Reader
+	Headers map[string]string
+
+	NextPage func(args ...interface{}) (string, bool, error)
+	Err      error
+
+	limiter *RequestLimiter
 }
 
 func (r *Request) Do() (*http.Response, error) {
@@ -54,13 +101,19 @@ func (r *Request) Do() (*http.Response, error) {
 	}
 	addHeaders(r.Headers, req)
 
-	client := http.DefaultClient
-	return client.Do(req)
+	time.Sleep(r.limiter.NextRequestTime(r.limiter.prevResponse))
+	resp, err := http.DefaultClient.Do(req)
+	r.limiter.prevResponse = resp
+	return resp, err
 }
 
 func (r *Request) DoAll() ([]*http.Response, error) {
 	if r.Err != nil {
 		return nil, r.Err
+	}
+
+	if r.NextPage == nil {
+		return nil, ErrNextPageFuncUndefined
 	}
 
 	var resps []*http.Response
@@ -76,14 +129,16 @@ func (r *Request) DoAll() ([]*http.Response, error) {
 		}
 		addHeaders(r.Headers, req)
 
+		time.Sleep(r.limiter.NextRequestTime(r.limiter.prevResponse))
 		resp, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		resps = append(resps, resp)
+		r.limiter.prevResponse = resp
 
 		var uri string
-		uri, hasNext, err = r.Next(resp)
+		uri, hasNext, err = r.NextPage(resp)
 		if err != nil {
 			return resps, err
 		}

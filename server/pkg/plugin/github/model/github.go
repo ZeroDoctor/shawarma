@@ -231,6 +231,8 @@ type GithubRepo struct {
 	Watchers                 int           `json:"watchers,omitempty"`
 	DefaultBranch            string        `json:"default_branch,omitempty"`
 	Organization             GithubOrg     `json:"organization,omitempty"`
+
+	Branches []GithubBranch `json:"branches"`
 }
 
 type GithubLicense struct {
@@ -248,12 +250,15 @@ type GithubBranch struct {
 	HtmlURL       string         `json:"html_url,omitempty"`
 	CommentsURL   string         `json:"comments_url,omitempty"`
 	Author        GithubOwner    `json:"author,omitempty"`
-	AuthorID      int            `db:"author_id"`
 	Committer     GithubOwner    `json:"committer,omitempty"`
-	CommitterID   int            `db:"committer_id"`
 	Parents       []GithubCommit `json:"parents,omitempty"`
 	Protected     bool           `json:"protected,omitempty"`
 	ProtectionURL string         `json:"protection_url,omitempty"`
+
+	SHA         string `db:"sha"`
+	RepoID      int    `db:"repo_id"`
+	AuthorID    int    `db:"author_id"`
+	CommitterID int    `db:"committer_id"`
 }
 
 type GithubCommit struct {

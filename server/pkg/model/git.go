@@ -22,6 +22,7 @@ type Repository struct {
 type Branch struct {
 	ID         int       `db:"id" json:"id"`
 	Name       string    `db:"name" json:"name"`
+	Hash       string    `json:"hash" db:"hash"`
 	CreatedAt  time.Time `db:"created_at" json:"created_at"`
 	ModifiedAt time.Time `db:"modified_at" json:"moified_at"`
 
@@ -36,5 +37,5 @@ type Commit struct {
 	Message   string    `db:"message" json:"message"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 
-	BranchID int `db:"branch_id" json:"branch_id"`
+	Parents []Commit `json:"commit"`
 }

@@ -1,25 +1,21 @@
 package service
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 
-	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/pkg/httputils"
-	"github.com/zerodoctor/shawarma/pkg/model"
 	gdb "github.com/zerodoctor/shawarma/pkg/plugin/github/db"
 	gmodel "github.com/zerodoctor/shawarma/pkg/plugin/github/model"
 )
 
 const (
 	GITHUB_OAUTH_TOKEN_URL string = "https://github.com/login/oauth/access_token"
-
-	GITHUB_API_ENDPOINT  string = "https://api.github.com"
-	GITHUB_AUTH_USER_URL string = GITHUB_API_ENDPOINT + "/user"
+	GITHUB_API_ENDPOINT    string = "https://api.github.com"
+	GITHUB_AUTH_USER_URL   string = GITHUB_API_ENDPOINT + "/user"
 )
 
 var (
@@ -29,57 +25,7 @@ var (
 
 type GithubService struct {
 	db *gdb.DB
-}
-
-func NewGithubService() *GithubService {
-	return &GithubService{}
-}
-
-func (s *GithubService) Setup(db db.DB) {
-	s.db = gdb.NewDB(db.GetType(), db.GetConnection())
-}
-
-func (s *GithubService) RegisterUser(details map[string]interface{}) (model.User, error) {
-	var user model.User
-
-	codeInter, ok := details["code"]
-	if !ok {
-		return user, ErrMissingGithubCode
-	}
-
-	code, ok := codeInter.(string)
-	if !ok {
-		return user, ErrFormatGithubCode
-	}
-
-	githubUser, err := s.SaveGithubAuthUser(code)
-	if err != nil {
-		return user, err
-	}
-	user.Name = githubUser.Login
-	user.AvatarURL = githubUser.AvatarURL
-
-	var orgs []model.Organization
-	for i := range githubUser.Orgs {
-		orgs = append(orgs, model.Organization{
-			Name:      githubUser.Orgs[i].Login,
-			AvatarURL: githubUser.Orgs[i].AvatarURL,
-		})
-	}
-	user.Organizations = orgs
-
-	var repos []model.Repository
-	for i := range githubUser.Repos {
-		repos = append(repos, model.Repository{
-			Name:          githubUser.Repos[i].Name,
-			Owner:         githubUser.Repos[i].Owner.Login,
-			OwnerType:     githubUser.Repos[i].Owner.Type,
-			DefaultBranch: githubUser.Repos[i].DefaultBranch,
-		})
-	}
-	user.Repositories = repos
-
-	return user, nil
+	*GithubRequestLimiter
 }
 
 func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, error) {
@@ -116,7 +62,7 @@ func (s *GithubService) GetGithubToken(code string) (string, error) {
 		GITHUB_OAUTH_TOKEN_URL, code,
 		os.Getenv("GITHUB_CLIENT_ID"), os.Getenv("GITHUB_CLIENT_SECRET"),
 	)
-	resp, err := NewRequest(httputils.POST, url, nil).Do()
+	resp, err := s.NewRequest(httputils.POST, url, nil).Do()
 	if err != nil {
 		return "", fmt.Errorf("failed to do request [error=%w]", err)
 	}
@@ -142,7 +88,7 @@ func (s *GithubService) GetGithubToken(code string) (string, error) {
 func (s *GithubService) GetGithubAuthUser(token string) (gmodel.GithubUser, error) {
 	var user gmodel.GithubUser
 
-	resp, err := NewRequest(httputils.GET, GITHUB_AUTH_USER_URL, nil).
+	resp, err := s.NewRequest(httputils.GET, GITHUB_AUTH_USER_URL, nil).
 		OptionGithubHeaders(token).
 		Do()
 	if err != nil {
@@ -162,12 +108,6 @@ func (s *GithubService) GetGithubAuthUser(token string) (gmodel.GithubUser, erro
 	}
 
 	return user, nil
-}
-
-func (s *GithubService) RegisterUserOrganizations(token string, user model.User) ([]model.Organization, error) {
-	var orgs []model.Organization
-	// TODO: implementation
-	return orgs, nil
 }
 
 func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser) ([]gmodel.GithubOrg, error) {
@@ -198,7 +138,7 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 func (s *GithubService) GetGithubUserOrgs(token string, userOrgsURL string) ([]gmodel.GithubUserOrg, error) {
 	var userOrgs []gmodel.GithubUserOrg
 
-	resps, err := NewRequest(httputils.GET, userOrgsURL, nil).
+	resps, err := s.NewRequest(httputils.GET, userOrgsURL, nil).
 		OptionGithubHeaders(token).
 		OptionGithubPages(100).
 		DoAll()
@@ -229,7 +169,7 @@ func (s *GithubService) GetGithubUserOrgs(token string, userOrgsURL string) ([]g
 func (s *GithubService) GetGithubOrg(token string, orgURL string) (gmodel.GithubOrg, error) {
 	var org gmodel.GithubOrg
 
-	resp, err := NewRequest(httputils.GET, orgURL, nil).
+	resp, err := s.NewRequest(httputils.GET, orgURL, nil).
 		OptionGithubHeaders(token).
 		Do()
 	if err != nil {
@@ -244,19 +184,11 @@ func (s *GithubService) GetGithubOrg(token string, orgURL string) (gmodel.Github
 		)
 	}
 
-	sql.Drivers()
-
 	if err := json.Unmarshal(data, &org); err != nil {
 		return org, fmt.Errorf("failed to unmarshal data from github org [error=%w]", err)
 	}
 
 	return org, nil
-}
-
-func (s *GithubService) RegisterUserRepositories(token string, user model.User) ([]model.Repository, error) {
-	var repos []model.Repository
-	// TODO: implementation
-	return repos, nil
 }
 
 func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser) ([]gmodel.GithubRepo, error) {
@@ -285,13 +217,21 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 		)
 	}
 
+	for i := range repos {
+		branches, err := s.SaveGithubBranches(token, repos[i].ID, repos[i].BranchesURL)
+		if err != nil {
+			return repos, fmt.Errorf("failed to save branches [error=%w]", err)
+		}
+		repos[i].Branches = branches
+	}
+
 	return repos, nil
 }
 
 func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.GithubRepo, error) {
 	var repos []gmodel.GithubRepo
 
-	resps, err := NewRequest(httputils.GET, reposURL, nil).
+	resps, err := s.NewRequest(httputils.GET, reposURL, nil).
 		OptionGithubHeaders(token).
 		OptionGithubPages(100).
 		DoAll()
@@ -319,10 +259,23 @@ func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.
 	return repos, nil
 }
 
+func (s *GithubService) SaveGithubBranches(token string, repoID int, branchesURL string) ([]gmodel.GithubBranch, error) {
+	branches, err := s.GetGithubBranches(token, branchesURL)
+	if err != nil {
+		return branches, fmt.Errorf("failed to fetch branches [error=%w]", err)
+	}
+
+	for i := range branches {
+		branches[i].RepoID = repoID
+	}
+
+	return s.db.SaveGithubBranches(branches)
+}
+
 func (s *GithubService) GetGithubBranches(token string, branchesURL string) ([]gmodel.GithubBranch, error) {
 	var branches []gmodel.GithubBranch
 
-	resps, err := NewRequest(httputils.GET, branchesURL, nil).
+	resps, err := s.NewRequest(httputils.GET, branchesURL, nil).
 		OptionGithubHeaders(token).
 		OptionGithubPages(100).
 		DoAll()
