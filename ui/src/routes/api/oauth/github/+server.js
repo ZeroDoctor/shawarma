@@ -1,15 +1,16 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
     let data = {
         code: url.searchParams.get('code'),
-        state: url.searchParams.get('state')
+        state: url.searchParams.get('state'),
+        type: "github"
     };
 
     try {
         let endpoint = import.meta.env.VITE_SERVER_ENDPOINT;
-        let resp = await fetch(endpoint+'/register/github/user', {
+        let resp = await fetch(endpoint+'/v1/register/user', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -21,5 +22,5 @@ export async function GET({ url }) {
     }
 
 
-    return new Response('', { status: 200 });
+    return redirect(302, '/project')
 }

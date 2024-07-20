@@ -20,4 +20,4 @@ run:
 ui:
 	@echo running ui...
 	cd ui && \
-	npm run dev &
+	npm run dev

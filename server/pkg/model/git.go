@@ -5,37 +5,37 @@ import (
 )
 
 type Repository struct {
-	UUID          UUID      `db:"uuid" json:"uuid"`
-	Owner         string    `db:"owner" json:"owner"`
-	Name          string    `db:"name" json:"name"`
-	DefaultBranch string    `db:"default_branch" json:"default_branch"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
-	ModifiedAt    time.Time `db:"modified_at" json:"modified_at"`
-	OwnerType     string    `db:"owner_type" json:"owner_type"`
-	OwnerID       UUID      `db:"owner_id" json:"owner_id"`
+	UUID          UUID      `db:"uuid" json:"uuid,omitempty"`
+	Owner         string    `db:"owner" json:"owner,omitempty"`
+	Name          string    `db:"name" json:"name,omitempty"`
+	DefaultBranch string    `db:"default_branch" json:"default_branch,omitempty"`
+	CreatedAt     time.Time `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt    time.Time `db:"modified_at" json:"modified_at,omitempty"`
+	OwnerType     string    `db:"owner_type" json:"owner_type,omitempty"`
+	OwnerID       UUID      `db:"owner_id" json:"owner_id,omitempty"`
 
-	Branches     []Branch      `json:"branches"`
-	Environments []Environment `json:"environments"`
+	Branches     []Branch      `json:"branches,omitempty"`
+	Environments []Environment `json:"environments,omitempty"`
 	Env          map[string]string
 }
 
 type Branch struct {
-	ID         int       `db:"id" json:"id"`
-	Name       string    `db:"name" json:"name"`
-	Hash       string    `json:"hash" db:"hash"`
-	CreatedAt  time.Time `db:"created_at" json:"created_at"`
-	ModifiedAt time.Time `db:"modified_at" json:"moified_at"`
+	ID         int       `db:"id" json:"id,omitempty"`
+	Name       string    `db:"name" json:"name,omitempty"`
+	Hash       string    `json:"hash" db:"hash,omitempty"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt time.Time `db:"modified_at" json:"moified_at,omitempty"`
 
-	RepoID UUID `db:"repo_id" json:"repo_id"`
+	RepoID UUID `db:"repo_id" json:"repo_id,omitempty"`
 
-	Commits []Commit `json:"commits"`
+	Commits []Commit `json:"commits,omitempty"`
 }
 
 type Commit struct {
-	Hash      string    `db:"commit" json:"hash"`
-	Author    string    `db:"author" json:"author"`
-	Message   string    `db:"message" json:"message"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	Hash      string    `db:"commit" json:"hash,omitempty"`
+	Author    string    `db:"author" json:"author,omitempty"`
+	Message   string    `db:"message" json:"message,omitempty"`
+	CreatedAt time.Time `db:"created_at" json:"created_at,omitempty"`
 
-	Parents []Commit `json:"commit"`
+	Parents []Commit `json:"commit,omitempty"`
 }

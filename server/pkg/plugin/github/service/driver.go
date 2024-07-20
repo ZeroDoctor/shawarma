@@ -42,16 +42,37 @@ func (gd *GithubDriver) RegisterUser(details map[string]interface{}) (model.User
 	user.Name = githubUser.Login
 	user.AvatarURL = githubUser.AvatarURL
 
+	return user, nil
+}
+
+func (gd *GithubDriver) RegisterUserOrganizations(user model.User) ([]model.Organization, error) {
 	var orgs []model.Organization
+
+	githubUsers, err := gd.db.GetGithubUserByName(user.Name)
+	if err != nil {
+		return orgs, err
+	}
+	githubUser := githubUsers[0]
+
 	for i := range githubUser.Orgs {
 		orgs = append(orgs, model.Organization{
 			Name:      githubUser.Orgs[i].Login,
 			AvatarURL: githubUser.Orgs[i].AvatarURL,
 		})
 	}
-	user.Organizations = orgs
 
+	return orgs, nil
+}
+
+func (gd *GithubDriver) RegisterUserRepositories(user model.User) ([]model.Repository, error) {
 	var repos []model.Repository
+
+	githubUsers, err := gd.db.GetGithubUserByName(user.Name)
+	if err != nil {
+		return repos, err
+	}
+	githubUser := githubUsers[0]
+
 	for i := range githubUser.Repos {
 		var branches []model.Branch
 		githubBranches := githubUser.Repos[i].Branches
@@ -70,20 +91,6 @@ func (gd *GithubDriver) RegisterUser(details map[string]interface{}) (model.User
 			Branches:      branches,
 		})
 	}
-	user.Repositories = repos
-
-	return user, nil
-}
-
-func (gd *GithubDriver) RegisterUserOrganizations(user model.User) ([]model.Organization, error) {
-	var orgs []model.Organization
-	// TODO: implementation
-	return orgs, nil
-}
-
-func (gd *GithubDriver) RegisterUserRepositories(user model.User) ([]model.Repository, error) {
-	var repos []model.Repository
-	// TODO: implementation
 	return repos, nil
 }
 

@@ -99,55 +99,55 @@ func (c Commands) Value() (driver.Value, error) {
 }
 
 type Pipeline struct {
-	ID         int            `db:"id" json:"id"`
-	Type       string         `db:"type" json:"type"`
-	Status     PipelineStatus `db:"status" json:"status"`
-	CreatedAt  time.Time      `db:"created_at" json:"created_at"`
-	ModifiedAt time.Time      `db:"modified_at" json:"modified_at"`
+	ID         int            `db:"id" json:"id,omitempty"`
+	Type       string         `db:"type" json:"type,omitempty"`
+	Status     PipelineStatus `db:"status" json:"status,omitempty"`
+	CreatedAt  time.Time      `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt time.Time      `db:"modified_at" json:"modified_at,omitempty"`
 
-	RepoID   uuid.UUID `db:"repo_id" json:"repo_id"`
-	RunnerID uuid.UUID `db:"runner_id" json:"runner_id"`
+	RepoID   uuid.UUID `db:"repo_id" json:"repo_id,omitempty"`
+	RunnerID uuid.UUID `db:"runner_id" json:"runner_id,omitempty"`
 
-	Steps  []Step  `json:"steps"`
-	Events []Event `json:"events"`
+	Steps  []Step  `json:"steps,omitempty"`
+	Events []Event `json:"events,omitempty"`
 }
 
 type Step struct {
-	UUID       UUID      `db:"uuid" json:"uuid"`
-	Name       string    `db:"name" json:"name"`
-	Image      string    `db:"image" json:"image"`
-	Commands   Commands  `db:"commands" json:"commands"`
-	Privileged bool      `db:"privileged" json:"privileged"`
-	Detach     bool      `db:"detach" json:"detach"`
-	CreatedAt  time.Time `db:"created_at" json:"created_at"`
-	ModifiedAt time.Time `db:"modified_at" json:"modified_at"`
+	UUID       UUID      `db:"uuid" json:"uuid,omitempty"`
+	Name       string    `db:"name" json:"name,omitempty"`
+	Image      string    `db:"image" json:"image,omitempty"`
+	Commands   Commands  `db:"commands" json:"commands,omitempty"`
+	Privileged bool      `db:"privileged" json:"privileged,omitempty"`
+	Detach     bool      `db:"detach" json:"detach,omitempty"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt time.Time `db:"modified_at" json:"modified_at,omitempty"`
 
-	PipelineID int `db:"pipeline_id" json:"pipeline_id"`
+	PipelineID int `db:"pipeline_id" json:"pipeline_id,omitempty"`
 
-	Events []Event `json:"events"`
+	Events []Event `json:"events,omitempty"`
 }
 
 type Environment struct {
-	Key        string    `db:"key" json:"key"`
-	Data       string    `db:"data" json:"data"`
-	Protected  bool      `db:"protected" json:"protected"`
-	CreatedAt  time.Time `db:"created_at" json:"created_at"`
-	ModifiedAt time.Time `db:"modified_at" json:"modified_at"`
+	Key        string    `db:"key" json:"key,omitempty"`
+	Data       string    `db:"data" json:"data,omitempty"`
+	Protected  bool      `db:"protected" json:"protected,omitempty"`
+	CreatedAt  time.Time `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt time.Time `db:"modified_at" json:"modified_at,omitempty"`
 
-	RepoID UUID `db:"repo_id" json:"repo_id"`
-	OrgID  UUID `db:"org_id" json:"org_id"`
+	RepoID UUID `db:"repo_id" json:"repo_id,omitempty"`
+	OrgID  UUID `db:"org_id" json:"org_id,omitempty"`
 }
 
 type Event struct {
-	Webhook    string          `db:"webhook" json:"webhook"`
-	Type       StatusEvent     `db:"type" json:"type"`
-	StatusName StatusEventName `db:"status_name" json:"status_name"`
-	Action     Action          `db:"action" json:"action"`
-	Deadline   string          `db:"deadline" json:"deadline"`
-	After      string          `db:"after" json:"after"`
-	CreatedAt  time.Time       `db:"created_at" json:"created_at"`
-	ModifiedAt time.Time       `db:"modified_at" json:"modified_at"`
+	Webhook    string          `db:"webhook" json:"webhook,omitempty"`
+	Type       StatusEvent     `db:"type" json:"type,omitempty"`
+	StatusName StatusEventName `db:"status_name" json:"status_name,omitempty"`
+	Action     Action          `db:"action" json:"action,omitempty"`
+	Deadline   string          `db:"deadline" json:"deadline,omitempty"`
+	After      string          `db:"after" json:"after,omitempty"`
+	CreatedAt  time.Time       `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt time.Time       `db:"modified_at" json:"modified_at,omitempty"`
 
-	PipelineID int  `db:"pipeline_id" json:"pipeline_id"`
-	StepID     UUID `db:"step_id" json:"step_id"`
+	PipelineID int  `db:"pipeline_id" json:"pipeline_id,omitempty"`
+	StepID     UUID `db:"step_id" json:"step_id,omitempty"`
 }

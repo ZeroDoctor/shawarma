@@ -22,10 +22,10 @@ func NewDB(dbType string, conn *sqlx.DB) *DB {
 	}
 }
 
-func (s *DB) GetGithubUserByName(user model.GithubUser) ([]model.GithubUser, error) {
+func (s *DB) GetGithubUserByName(name string) ([]model.GithubUser, error) {
 	var users []model.GithubUser
 	query := `SELECT * FROM github_users WHERE "name" = ?`
-	err := s.conn.Select(&users, query, user.Name)
+	err := s.conn.Select(&users, query, name)
 	if len(users) <= 0 {
 		return users, ErrUserNotFound
 	}
@@ -212,6 +212,10 @@ func (s *DB) SaveGithubBranches(branches []model.GithubBranch) ([]model.GithubBr
 }
 
 func (s *DB) SaveGithubCommits(commits []model.GithubCommit) ([]model.GithubCommit, error) {
+	if len(commits) <= 0 {
+		return commits, nil
+	}
+
 	insert := `INSERT INTO github_commits (
 		sha, "message", "url"
 	) VALUES (

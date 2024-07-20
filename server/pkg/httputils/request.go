@@ -72,7 +72,7 @@ func (rl *RequestLimiter) NewRequest(method, u string, body io.Reader) *Request 
 		Method: method,
 		Body:   body,
 
-		limiter: rl,
+		Limiter: rl,
 	}
 }
 
@@ -85,7 +85,7 @@ type Request struct {
 	NextPage func(args ...interface{}) (string, bool, error)
 	Err      error
 
-	limiter *RequestLimiter
+	Limiter *RequestLimiter
 }
 
 func (r *Request) Do() (*http.Response, error) {
@@ -101,9 +101,9 @@ func (r *Request) Do() (*http.Response, error) {
 	}
 	addHeaders(r.Headers, req)
 
-	time.Sleep(r.limiter.NextRequestTime(r.limiter.prevResponse))
+	time.Sleep(r.Limiter.NextRequestTime(r.Limiter.prevResponse))
 	resp, err := http.DefaultClient.Do(req)
-	r.limiter.prevResponse = resp
+	r.Limiter.prevResponse = resp
 	return resp, err
 }
 
@@ -129,13 +129,15 @@ func (r *Request) DoAll() ([]*http.Response, error) {
 		}
 		addHeaders(r.Headers, req)
 
-		time.Sleep(r.limiter.NextRequestTime(r.limiter.prevResponse))
+		fmt.Printf("[url=%s] [method=%s] [headers=%+v]\n", r.Uri.String(), r.Method, r.Headers)
+
+		time.Sleep(r.Limiter.NextRequestTime(r.Limiter.prevResponse))
 		resp, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		resps = append(resps, resp)
-		r.limiter.prevResponse = resp
+		r.Limiter.prevResponse = resp
 
 		var uri string
 		uri, hasNext, err = r.NextPage(resp)

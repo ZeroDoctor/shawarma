@@ -229,7 +229,7 @@ type GithubRepo struct {
 	Forks                    int           `json:"forks,omitempty"`
 	OpenIssues               int           `json:"open_issues,omitempty"`
 	Watchers                 int           `json:"watchers,omitempty"`
-	DefaultBranch            string        `json:"default_branch,omitempty"`
+	DefaultBranch            string        `json:"default_branch,omitempty" db:"default_branch"`
 	Organization             GithubOrg     `json:"organization,omitempty"`
 
 	Branches []GithubBranch `json:"branches"`

@@ -23,6 +23,7 @@ type DB interface {
 	SaveCommit(model.Commit) (model.Commit, error)
 	SaveRunner(model.Runner) (model.Runner, error)
 	SaveUser(model.User) (model.User, error)
+	QueryUserByName(string) (model.User, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {

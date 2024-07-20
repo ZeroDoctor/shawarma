@@ -16,13 +16,13 @@
 
 </script>
 
-<div class="flex justify-center items-center">
+<div class="body flex justify-center items-center">
     <button type="button" class="btn variant-filled" on:click={githubRedirect}>Welcome</button>
 </div>
 
 
 <style>
-    div {
+    .body {
         height: 100vh;
     }
 </style>

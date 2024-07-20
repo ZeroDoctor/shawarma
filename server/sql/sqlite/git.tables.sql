@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS branches (
 
     repo_id          TEXT,
 
-    FOREIGN KEY("hash") REFERENCES commits("hash")
+    FOREIGN KEY("hash") REFERENCES commits("hash"),
     FOREIGN KEY(repo_id) REFERENCES repositories(uuid)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS commits (
     "hash"     TEXT PRIMARY KEY,
     author     TEXT,
     "message"  TEXT,
-    created_at INT,
+    created_at INT
 );
 
 CREATE TABLE IF NOT EXISTS commit_parents (

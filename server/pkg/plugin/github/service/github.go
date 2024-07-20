@@ -42,6 +42,11 @@ func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, erro
 	}
 	githubUser.Token = token
 
+	githubUser, err = s.db.SaveGithubAuthUser(githubUser)
+	if err != nil {
+		return githubUser, fmt.Errorf("failed to save github user [error=%w]", err)
+	}
+
 	githubOrgs, err := s.SaveGithubUserOrgs(token, githubUser)
 	if err != nil {
 		return githubUser, fmt.Errorf("failed to save github user orgs [error=%w]", err)
@@ -62,7 +67,9 @@ func (s *GithubService) GetGithubToken(code string) (string, error) {
 		GITHUB_OAUTH_TOKEN_URL, code,
 		os.Getenv("GITHUB_CLIENT_ID"), os.Getenv("GITHUB_CLIENT_SECRET"),
 	)
-	resp, err := s.NewRequest(httputils.POST, url, nil).Do()
+	resp, err := s.NewRequest(httputils.POST, url, nil).
+		OptionGithubHeaders("").
+		Do()
 	if err != nil {
 		return "", fmt.Errorf("failed to do request [error=%w]", err)
 	}
@@ -218,7 +225,9 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 	}
 
 	for i := range repos {
-		branches, err := s.SaveGithubBranches(token, repos[i].ID, repos[i].BranchesURL)
+		// we want all branches here
+		branchesURL := patternReplaceAll(repos[i].BranchesURL, map[string]string{"/branch": ""})
+		branches, err := s.SaveGithubBranches(token, repos[i].ID, branchesURL)
 		if err != nil {
 			return repos, fmt.Errorf("failed to save branches [error=%w]", err)
 		}

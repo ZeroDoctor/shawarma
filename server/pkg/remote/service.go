@@ -2,7 +2,7 @@ package remote
 
 import "github.com/zerodoctor/shawarma/internal/db"
 
-var remoteServicesMap map[string]GitRemoteDriver
+var remoteServicesMap map[string]GitRemoteDriver = make(map[string]GitRemoteDriver)
 var remoteServices []string
 
 func Register(remoteName string, remote GitRemoteDriver) {
