@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     "session"      TEXT UNIQUE,
     avatar_url     TEXT,
     git_remote     TEXT,
+    is_owner       INT,
     created_at     INT,
     modified_at    INT,
 
@@ -18,5 +19,6 @@ CREATE TABLE IF NOT EXISTS organizations (
     created_at  INT,
     modified_at INT,
 
+    FOREIGN KEY("owner") REFERENCES users("name"),
     PRIMARY KEY("name")
 );

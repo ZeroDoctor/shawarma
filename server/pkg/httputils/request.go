@@ -129,8 +129,6 @@ func (r *Request) DoAll() ([]*http.Response, error) {
 		}
 		addHeaders(r.Headers, req)
 
-		fmt.Printf("[url=%s] [method=%s] [headers=%+v]\n", r.Uri.String(), r.Method, r.Headers)
-
 		time.Sleep(r.Limiter.NextRequestTime(r.Limiter.prevResponse))
 		resp, err := client.Do(req)
 		if err != nil {

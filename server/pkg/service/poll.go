@@ -14,6 +14,19 @@ const (
 	DONE
 )
 
+func (ps PollStatus) String() string {
+	switch ps {
+	case INIT:
+		return "INIT"
+	case PENDING:
+		return "PENDING"
+	case DONE:
+		return "DONE"
+	}
+
+	return "UNKNOWN"
+}
+
 type Poll struct {
 	ID  uuid.UUID
 	URL string
@@ -52,6 +65,6 @@ func (p Poll) Status() PollStatus {
 	return p.status
 }
 
-func (p *Poll) Failed() error {
+func (p *Poll) Error() error {
 	return <-p.failedChan
 }

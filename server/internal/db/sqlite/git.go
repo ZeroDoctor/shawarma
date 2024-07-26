@@ -55,7 +55,7 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 
 func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	insert := `INSERT INTO branches (
-		id, "name", "hash:, created_at,
+		id, "name", "hash", created_at,
 		modified_at, repo_id
 	) VALUES (
 		:id, :name, :hash, :created_at,

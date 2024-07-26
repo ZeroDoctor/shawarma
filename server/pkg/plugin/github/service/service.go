@@ -14,6 +14,8 @@ import (
 )
 
 const (
+	REMOTE_TYPE string = "github"
+
 	GITHUB_API_VERSION    string = "2022-11-28"
 	GITHUB_API_ACCEPT     string = "application/vnd.github+json"
 	GITHUB_RATE_REMAINING string = "x-ratelimit-remaining"

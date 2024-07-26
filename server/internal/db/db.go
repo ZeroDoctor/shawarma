@@ -13,6 +13,7 @@ var log = logger.Log
 type DB interface {
 	GetConnection() *sqlx.DB
 	GetType() string
+
 	SavePipeline(model.Pipeline) (model.Pipeline, error)
 	SaveStep(model.Step) (model.Step, error)
 	SaveEvent(model.Event) (model.Event, error)
@@ -23,7 +24,9 @@ type DB interface {
 	SaveCommit(model.Commit) (model.Commit, error)
 	SaveRunner(model.Runner) (model.Runner, error)
 	SaveUser(model.User) (model.User, error)
+
 	QueryUserByName(string) (model.User, error)
+	QueryUserCount() (int, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {

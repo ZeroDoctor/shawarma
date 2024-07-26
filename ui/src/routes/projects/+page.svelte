@@ -1,5 +1,5 @@
 
-<div class="body">
+<div class="body flex justify-center items-center">
 </div>
 
 <style>

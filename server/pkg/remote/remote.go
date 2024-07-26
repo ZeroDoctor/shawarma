@@ -9,7 +9,8 @@ type GitRemoteDriver interface {
 	Setup(db.DB)
 
 	RegisterUser(map[string]interface{}) (model.User, error)
-	RegisterUserOrganizations(model.User) ([]model.Organization, error)
-	RegisterUserRepositories(model.User) ([]model.Repository, error)
-	GetCommitsURL(model.User, []string) ([]model.Commit, error)
+	RegisterUserOrganizations(string, model.User) ([]model.Organization, error)
+	RegisterUserRepositories(string, model.User) ([]model.Repository, error)
+
+	GetCommitsURL(string, model.User, []string) ([]model.Commit, error)
 }

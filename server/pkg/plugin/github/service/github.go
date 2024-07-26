@@ -47,18 +47,6 @@ func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, erro
 		return githubUser, fmt.Errorf("failed to save github user [error=%w]", err)
 	}
 
-	githubOrgs, err := s.SaveGithubUserOrgs(token, githubUser)
-	if err != nil {
-		return githubUser, fmt.Errorf("failed to save github user orgs [error=%w]", err)
-	}
-	githubUser.Orgs = githubOrgs
-
-	repos, err := s.SaveGithubUserRepos(token, githubUser)
-	if err != nil {
-		return githubUser, fmt.Errorf("failed to save github user repos [error=%w]", err)
-	}
-	githubUser.Repos = repos
-
 	return githubUser, nil
 }
 

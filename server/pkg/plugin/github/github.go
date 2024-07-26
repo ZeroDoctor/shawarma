@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	remote.Register("github", service.NewGithubDriver())
+	remote.Register(service.REMOTE_TYPE, service.NewGithubDriver())
 }

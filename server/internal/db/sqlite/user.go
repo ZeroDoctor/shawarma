@@ -7,6 +7,18 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
+func (s *SqliteDB) QueryUserCount() (int, error) {
+	var count []int
+	query := `SELECT COUNT(uuid) FROM users;`
+
+	err := s.conn.Select(&count, query)
+	if len(count) <= 0 {
+		return 0, err
+	}
+
+	return count[0], err
+}
+
 func (s *SqliteDB) QueryUserByName(name string) (model.User, error) {
 	var user model.User
 	var err error
@@ -53,10 +65,10 @@ func (s *SqliteDB) SaveUser(user model.User) (model.User, error) {
 
 	insert := `INSERT INTO users (
 		uuid, "name", "session", avatar_url,
-		git_remote, created_at, modified_at
+		git_remote, is_owner, created_at, modified_at
 	) VALUES (
 		:uuid, :name, :session, :avatar_url,
-		:git_remote, :created_at, :modified_at
+		:git_remote, :is_owner, :created_at, :modified_at
 	) ON CONFLICT("name") DO UPDATE SET
 		uuid        = excluded.uuid,
 		session     = excluded.session,

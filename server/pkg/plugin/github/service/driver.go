@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/pkg/model"
 	gdb "github.com/zerodoctor/shawarma/pkg/plugin/github/db"
@@ -42,10 +44,15 @@ func (gd *GithubDriver) RegisterUser(details map[string]interface{}) (model.User
 	user.Name = githubUser.Login
 	user.AvatarURL = githubUser.AvatarURL
 
+	if user.Tokens == nil {
+		user.Tokens = make(map[string]string)
+	}
+	user.Tokens[REMOTE_TYPE] = githubUser.Token
+
 	return user, nil
 }
 
-func (gd *GithubDriver) RegisterUserOrganizations(user model.User) ([]model.Organization, error) {
+func (gd *GithubDriver) RegisterUserOrganizations(token string, user model.User) ([]model.Organization, error) {
 	var orgs []model.Organization
 
 	githubUsers, err := gd.db.GetGithubUserByName(user.Name)
@@ -53,6 +60,12 @@ func (gd *GithubDriver) RegisterUserOrganizations(user model.User) ([]model.Orga
 		return orgs, err
 	}
 	githubUser := githubUsers[0]
+
+	githubOrgs, err := gd.SaveGithubUserOrgs(token, githubUser)
+	if err != nil {
+		return orgs, fmt.Errorf("failed to save github user orgs [error=%w]", err)
+	}
+	githubUser.Orgs = githubOrgs
 
 	for i := range githubUser.Orgs {
 		orgs = append(orgs, model.Organization{
@@ -64,7 +77,7 @@ func (gd *GithubDriver) RegisterUserOrganizations(user model.User) ([]model.Orga
 	return orgs, nil
 }
 
-func (gd *GithubDriver) RegisterUserRepositories(user model.User) ([]model.Repository, error) {
+func (gd *GithubDriver) RegisterUserRepositories(token string, user model.User) ([]model.Repository, error) {
 	var repos []model.Repository
 
 	githubUsers, err := gd.db.GetGithubUserByName(user.Name)
@@ -72,6 +85,12 @@ func (gd *GithubDriver) RegisterUserRepositories(user model.User) ([]model.Repos
 		return repos, err
 	}
 	githubUser := githubUsers[0]
+
+	githubRepos, err := gd.SaveGithubUserRepos(token, githubUser)
+	if err != nil {
+		return repos, fmt.Errorf("failed to save github user repos [error=%w]", err)
+	}
+	githubUser.Repos = githubRepos
 
 	for i := range githubUser.Repos {
 		var branches []model.Branch
@@ -94,7 +113,7 @@ func (gd *GithubDriver) RegisterUserRepositories(user model.User) ([]model.Repos
 	return repos, nil
 }
 
-func (gd *GithubDriver) GetCommitsURL(user model.User, hashes []string) ([]model.Commit, error) {
+func (gd *GithubDriver) GetCommitsURL(token string, user model.User, hashes []string) ([]model.Commit, error) {
 	var commits []model.Commit
 	// TODO: implementation
 	return commits, nil

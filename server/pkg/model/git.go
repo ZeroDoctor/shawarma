@@ -22,7 +22,7 @@ type Repository struct {
 type Branch struct {
 	ID         int       `db:"id" json:"id,omitempty"`
 	Name       string    `db:"name" json:"name,omitempty"`
-	Hash       string    `json:"hash" db:"hash,omitempty"`
+	Hash       string    `db:"hash" json:"hash,omitempty"`
 	CreatedAt  time.Time `db:"created_at" json:"created_at,omitempty"`
 	ModifiedAt time.Time `db:"modified_at" json:"moified_at,omitempty"`
 

@@ -47,14 +47,12 @@ func (api *API) controllerV1(router *gin.RouterGroup) {
 }
 
 func internalError(ctx *gin.Context, err error) {
-	log.Errorf("internal server error [error=%s]", err.Error())
 	ctx.JSON(http.StatusInternalServerError, gin.H{
 		"error": err.Error(),
 	})
 }
 
 func badRequestError(ctx *gin.Context, err error) {
-	log.Errorf("bad request [error=%s]", err.Error())
 	ctx.JSON(http.StatusBadRequest, gin.H{
 		"error": err.Error(),
 	})
