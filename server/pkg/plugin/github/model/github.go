@@ -97,6 +97,10 @@ type GithubUserOrg struct {
 	Description      string `json:"description,omitempty"`
 }
 
+func (guo GithubUserOrg) GetID() int {
+	return guo.ID
+}
+
 type GithubUsersOrgs struct {
 	UserID    string `json:"github_user_id,omitempty" db:"github_user_id"`
 	OrgID     string `json:"github_org_id,omitempty" db:"github_org_id"`
@@ -233,6 +237,10 @@ type GithubRepo struct {
 	Organization             GithubOrg     `json:"organization,omitempty"`
 
 	Branches []GithubBranch `json:"branches"`
+}
+
+func (gr GithubRepo) GetID() int {
+	return gr.ID
 }
 
 type GithubLicense struct {

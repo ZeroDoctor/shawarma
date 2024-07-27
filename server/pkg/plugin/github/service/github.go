@@ -13,9 +13,11 @@ import (
 )
 
 const (
-	GITHUB_OAUTH_TOKEN_URL string = "https://github.com/login/oauth/access_token"
-	GITHUB_API_ENDPOINT    string = "https://api.github.com"
-	GITHUB_AUTH_USER_URL   string = GITHUB_API_ENDPOINT + "/user"
+	GITHUB_OAUTH_TOKEN_URL     string = "https://github.com/login/oauth/access_token"
+	GITHUB_API_ENDPOINT        string = "https://api.github.com"
+	GITHUB_AUTH_USER_ORGS_URL  string = GITHUB_API_ENDPOINT + "/user/orgs"
+	GITHUB_AUTH_USER_REPOS_URL string = GITHUB_API_ENDPOINT + "/user/repos"
+	GITHUB_AUTH_USER_URL       string = GITHUB_API_ENDPOINT + "/user"
 )
 
 var (
@@ -112,12 +114,19 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 	if err != nil {
 		return githubOrgs, fmt.Errorf("failed to fetch github user orgs [error=%w]", err)
 	}
+	githubUserOrgsSet := NewSet(githubUserOrgs...)
 
-	for i := range githubUserOrgs {
-		org, err := s.GetGithubOrg(token, githubUserOrgs[i].URL)
+	githubUserOrgs, err = s.GetGithubUserOrgs(token, GITHUB_AUTH_USER_ORGS_URL)
+	if err != nil {
+		return githubOrgs, fmt.Errorf("failed to fetch github user orgs [error=%w]", err)
+	}
+	githubUserOrgsSet = AppendSet(githubUserOrgsSet, githubUserOrgs...)
+
+	for _, userOrg := range githubUserOrgsSet {
+		org, err := s.GetGithubOrg(token, userOrg.URL)
 		if err != nil {
 			return githubOrgs, fmt.Errorf("failed to fetch github [org=%s] [error=%w]",
-				githubUserOrgs[i].Login, err,
+				userOrg.Login, err,
 			)
 		}
 		org, err = s.db.SaveGithubUserOrg(user.ID, org)
@@ -125,6 +134,12 @@ func (s *GithubService) SaveGithubUserOrgs(token string, user gmodel.GithubUser)
 			return githubOrgs, fmt.Errorf("failed to save [org=%s] [error=%w]", org.Login, err)
 		}
 		githubOrgs = append(githubOrgs, org)
+	}
+
+	user.Orgs = githubOrgs
+	_, err = s.SaveGithubUserRepos(token, user)
+	if err != nil {
+		return githubOrgs, fmt.Errorf("failed to save github org repos [error=%w]", err)
 	}
 
 	return githubOrgs, nil
@@ -142,14 +157,13 @@ func (s *GithubService) GetGithubUserOrgs(token string, userOrgsURL string) ([]g
 	}
 
 	for _, resp := range resps {
-		defer resp.Body.Close()
-
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return userOrgs, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
 				userOrgsURL, err,
 			)
 		}
+		resp.Body.Close()
 
 		var orgs []gmodel.GithubUserOrg
 		if err := json.Unmarshal(data, &orgs); err != nil {
@@ -193,7 +207,13 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 	if err != nil {
 		return repos, fmt.Errorf("failed to fetch [user=%s] repos [error=%w]", user.Login, err)
 	}
-	repos = append(repos, userRepos...)
+	userReposSet := NewSet(userRepos...)
+
+	userRepos, err = s.GetGithubRepos(token, GITHUB_AUTH_USER_REPOS_URL)
+	if err != nil {
+		return repos, fmt.Errorf("failed to fetch [user=%s] repos [error=%w]", user.Login, err)
+	}
+	userReposSet = AppendSet(userReposSet, userRepos...)
 
 	for i := range user.Orgs {
 		orgRepos, err := s.GetGithubRepos(token, user.Orgs[i].ReposURL)
@@ -202,9 +222,10 @@ func (s *GithubService) SaveGithubUserRepos(token string, user gmodel.GithubUser
 				user.Login, user.Orgs[i].Login, err,
 			)
 		}
-		repos = append(repos, orgRepos...)
+		userReposSet = AppendSet(userReposSet, orgRepos...)
 	}
 
+	repos = SetToSlice(userReposSet)
 	repos, err = s.db.SaveGithubRepo(repos)
 	if err != nil {
 		return repos, fmt.Errorf("failed to save [user=%s] repos [error=%w]",
@@ -237,14 +258,13 @@ func (s *GithubService) GetGithubRepos(token string, reposURL string) ([]gmodel.
 	}
 
 	for _, resp := range resps {
-		defer resp.Body.Close()
-
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return repos, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
 				reposURL, err,
 			)
 		}
+		resp.Body.Close()
 
 		var tempRepos []gmodel.GithubRepo
 		if err := json.Unmarshal(data, &tempRepos); err != nil {
@@ -281,14 +301,13 @@ func (s *GithubService) GetGithubBranches(token string, branchesURL string) ([]g
 	}
 
 	for _, resp := range resps {
-		defer resp.Body.Close()
-
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return branches, fmt.Errorf("failed to read all response from [url=%s] [error=%w]",
 				branchesURL, err,
 			)
 		}
+		resp.Body.Close()
 
 		var tempBranches []gmodel.GithubBranch
 		if err := json.Unmarshal(data, &tempBranches); err != nil {

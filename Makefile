@@ -16,6 +16,12 @@ run:
 	@echo running server...
 	./shawarma
 
+.PHONY: clean
+clean:
+	@echo cleaning server...
+	rm shawarma || true
+	rm shawarma.db || true
+
 .PHONY: ui 
 ui:
 	@echo running ui...
