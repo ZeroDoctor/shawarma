@@ -5,22 +5,28 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/zerodoctor/shawarma/internal/logger"
-	"github.com/zerodoctor/shawarma/internal/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 var log = logger.Log
 
 type DB interface {
-	InsertPipeline(model.Pipeline) (model.Pipeline, error)
-	InsertStep(model.Step) (model.Step, error)
-	InsertEvent(model.Event) (model.Event, error)
-	InsertEnvironment(model.Environment) (model.Environment, error)
-	InsertOrganization(model.Organization) (model.Organization, error)
-	InsertRepository(model.Repository) (model.Repository, error)
-	InsertBranch(model.Branch) (model.Branch, error)
-	InsertCommit(model.Commit) (model.Commit, error)
-	InsertRunner(model.Runner) (model.Runner, error)
-	InsertGithubUser(model.GithubUser) (model.User, error)
+	GetConnection() *sqlx.DB
+	GetType() string
+
+	SavePipeline(model.Pipeline) (model.Pipeline, error)
+	SaveStep(model.Step) (model.Step, error)
+	SaveEvent(model.Event) (model.Event, error)
+	SaveEnvironment(model.Environment) (model.Environment, error)
+	SaveOrganization(model.Organization) (model.Organization, error)
+	SaveRepository(model.Repository) (model.Repository, error)
+	SaveBranch(model.Branch) (model.Branch, error)
+	SaveCommit(model.Commit) (model.Commit, error)
+	SaveRunner(model.Runner) (model.Runner, error)
+	SaveUser(model.User) (model.User, error)
+
+	QueryUserByName(string) (model.User, error)
+	QueryUserCount() (int, error)
 }
 
 func LoadSchemaFromFile(db *sqlx.DB, path string) error {
