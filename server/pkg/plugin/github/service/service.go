@@ -46,29 +46,6 @@ func NextRequestTime(resp *http.Response) time.Duration {
 	return 0
 }
 
-func patternReplace(template string, replace map[string]string) string {
-	bracketStart := strings.Index(template, "{")
-	bracketEnd := strings.Index(template, "}")
-
-	key := template[bracketStart+1 : bracketEnd]
-
-	return template[:bracketStart] + replace[key] + template[bracketEnd+1:]
-}
-
-func patternReplaceAll(template string, replace map[string]string) string {
-	bracketStart := strings.Index(template, "{")
-	if bracketStart == -1 {
-		return template
-	}
-
-	for bracketStart != -1 {
-		template = patternReplace(template, replace)
-		bracketStart = strings.Index(template, "{")
-	}
-
-	return template
-}
-
 func (grl *GithubRequestLimiter) NewRequest(method, u string, body io.Reader) *GithubRequest {
 
 	uri, err := url.Parse(u)
@@ -188,4 +165,27 @@ func (r *GithubRequest) OptionGithubPagination() *GithubRequest {
 	}
 
 	return r
+}
+
+func patternReplace(template string, replace map[string]string) string {
+	bracketStart := strings.Index(template, "{")
+	bracketEnd := strings.Index(template, "}")
+
+	key := template[bracketStart+1 : bracketEnd]
+
+	return template[:bracketStart] + replace[key] + template[bracketEnd+1:]
+}
+
+func patternReplaceAll(template string, replace map[string]string) string {
+	bracketStart := strings.Index(template, "{")
+	if bracketStart == -1 {
+		return template
+	}
+
+	for bracketStart != -1 {
+		template = patternReplace(template, replace)
+		bracketStart = strings.Index(template, "{")
+	}
+
+	return template
 }

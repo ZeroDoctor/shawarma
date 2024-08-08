@@ -21,7 +21,6 @@
     <button type="button" class="btn variant-filled" on:click={githubRedirect}>Welcome</button>
 </div>
 
-
 <style>
     .body {
         height: 100vh;
