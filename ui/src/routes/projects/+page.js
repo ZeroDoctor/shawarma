@@ -4,14 +4,14 @@ export function load({ params }) {
         tree: [
             {
                 id: 'unique-id-1',
-                content: 'home',
-                lead: '/',
+                content: 'github.com/ZeroDoc-s-Stack/zdapi',
+                lead: '#',
                 children: []
             },
             {
                 id: 'unique-id-2',
-                content: 'youtube',
-                lead: 'https://www.youtube.com',
+                content: 'github.com/ZeroDoc-s-Stack/zdweb',
+                lead: '#',
                 children: []
             }
         ]

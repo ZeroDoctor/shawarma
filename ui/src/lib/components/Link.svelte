@@ -4,4 +4,6 @@
     export let content;
 </script>
 
-<a class={style} {href}>{content}</a>
+<a class={style} {href}>
+    {content}
+</a>

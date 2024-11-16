@@ -1,4 +1,3 @@
-
 // @ts-check
 import { join } from 'path';
 
@@ -8,26 +7,39 @@ import { ShawarmaTheme } from './shawarma-theme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
-  content: [
-    "./src/**/*.{html,js,svelte,ts}",
-    join(
-      require.resolve('@skeletonlabs/skeleton'),
-      '../**/*.{html,js,svelte,ts}'
-    )
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-    require("@tailwindcss/typography"),
-    skeleton({
-      themes: {
-        custom: [
-          ShawarmaTheme
-        ]
-      }
-    })
-  ],
-}
+	darkMode: 'class',
+	content: [
+		'./src/**/*.{html,js,svelte,ts}',
+		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
+	],
+	theme: {
+		extend: {},
+		screens: {
+			xs: '312px',
+			// => @media (min-width: 312px) { ... }
 
+			sm: '640px',
+			// => @media (min-width: 640px) { ... }
+
+			md: '768px',
+			// => @media (min-width: 768px) { ... }
+
+			lg: '1024px',
+			// => @media (min-width: 1024px) { ... }
+
+			xl: '1280px',
+			// => @media (min-width: 1280px) { ... }
+
+			'2xl': '1536px'
+			// => @media (min-width: 1536px) { ... }
+		}
+	},
+	plugins: [
+		require('@tailwindcss/typography'),
+		skeleton({
+			themes: {
+				custom: [ShawarmaTheme]
+			}
+		})
+	]
+};
