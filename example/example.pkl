@@ -1,8 +1,7 @@
-// import "https://raw.githubusercontent.com/ZeroDoctor/shawarma/develop/shawarma.pkl"
-import "../shawarma.pkl"
+// amends "https://raw.githubusercontent.com/ZeroDoctor/shawarma/develop/shawarma.pkl"
+amends "../shawarma.pkl"
 
-
-pipeline = new shawarma.Pipeline {
+pipeline {
     type = "amd64"
 
     steps {

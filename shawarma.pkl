@@ -40,4 +40,4 @@ class Pipeline {
     on_time: Listing<TimeEvent>
 }
 
-pipeline: Pipeline = new {}
+pipeline: Pipeline
