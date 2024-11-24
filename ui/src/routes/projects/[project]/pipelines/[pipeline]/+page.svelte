@@ -1,4 +1,3 @@
-
 <script>
 	import MenuIcon from '$lib/svg/MenuIcon.svelte';
     import { AppBar } from '@skeletonlabs/skeleton';
@@ -28,11 +27,9 @@
     </svelte:fragment>
 </AppBar>
 
-<div class="flex flex-row max-w-full bg-surface-900 shadow-2xl">
-    <h4>Projects Not Found</h4>
-</div>
-
-
 <Drawer>
-    <h4>Projects Not Found</h4>
+    <nav class="block list-nav mt-8 ml-3">
+        <ul class="list">
+        </ul>
+    </nav>
 </Drawer>

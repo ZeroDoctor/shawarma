@@ -39,6 +39,7 @@
 	"type": "module",
 	"dependencies": {
 		"@tailwindcss/typography": "^0.5.13",
-		"@tsndr/cloudflare-worker-jwt": "^2.5.3"
+		"@tsndr/cloudflare-worker-jwt": "^2.5.3",
+		"highlight.js": "^11.10.0"
 	}
 }
