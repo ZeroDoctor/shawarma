@@ -80,7 +80,7 @@
             <li>
                 <div class="flex items-center">
                     <span>-</span>
-                    <a class="btn bg-initial w-full whitespace-normal" href={project.url} 
+                    <a class="btn bg-initial w-full whitespace-normal" href={'/projects/'+project.id} 
                         on:click={() => {currentProject = index}}>
                         {project.content}
                     </a>
