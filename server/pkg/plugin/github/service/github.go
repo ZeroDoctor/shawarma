@@ -43,6 +43,9 @@ func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, erro
 		return githubUser, fmt.Errorf("failed to fetch github user [error=%w]", err)
 	}
 	githubUser.Token = token
+	if _, err := s.db.GetGithubUserByName(githubUser.Login); err == nil {
+		return githubUser, nil
+	}
 
 	githubUser, err = s.db.SaveGithubAuthUser(githubUser)
 	if err != nil {
@@ -55,7 +58,7 @@ func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, erro
 func (s *GithubService) GetGithubToken(code string) (string, error) {
 	url := fmt.Sprintf("%s?code=%s&client_id=%s&client_secret=%s",
 		GITHUB_OAUTH_TOKEN_URL, code,
-		os.Getenv("GITHUB_CLIENT_ID"), os.Getenv("GITHUB_CLIENT_SECRET"),
+		os.Getenv("SHAW_GITHUB_CLIENT_ID"), os.Getenv("SHAW_GITHUB_CLIENT_SECRET"),
 	)
 	resp, err := s.NewRequest(httputils.POST, url, nil).
 		OptionGithubHeaders("").

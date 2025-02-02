@@ -1,8 +1,11 @@
 
 /** @type {import('./$types').PageLoad} */
-export function load({ params }) {
-    console.log(params.project);
-    return {
+export async function load({ params, fetch }) {
+
+    let endpoint = import.meta.env.VITE_SERVER_ENDPOINT;
+	let reposResponse = await fetch(endpoint+"/v1/repos")
+
+    let data = {
         current: 0,
         projects: [
             {
@@ -18,5 +21,13 @@ export function load({ params }) {
                 children: []
             }
         ]
-    };
+    }
+
+    data.projects.forEach((project, index) => {
+        if(params.project === project.id) {
+            data.current = index;
+        }
+    });
+
+    return data;
 }

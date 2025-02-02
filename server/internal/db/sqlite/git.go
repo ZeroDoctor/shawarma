@@ -53,6 +53,13 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 	return repository, nil
 }
 
+func (s *SqliteDB) GetAllUserRepos(user model.User) ([]model.Repository, error) {
+	var repos []model.Repository
+	query := `SELECT * FROM repositories;`
+	err := s.conn.Select(&repos, query)
+	return repos, err
+}
+
 func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	insert := `INSERT INTO branches (
 		id, "name", "hash", created_at,
@@ -84,6 +91,14 @@ func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 	}
 
 	return branch, nil
+}
+
+func (s *SqliteDB) GetBranches(repoID model.UUID) ([]model.Branch, error) {
+	var branches []model.Branch
+	query := `SELECT * FROM branches WHERE repo_id = ?;`
+
+	err := s.conn.Select(&branches, query, repoID)
+	return branches, err
 }
 
 func (s *SqliteDB) SaveCommit(commit model.Commit) (model.Commit, error) {

@@ -11,9 +11,6 @@
     let drawerSettings = {
         width: 'w-[280px] md:w-[480px]'
     }
-
-    /** @type {import('./$types').PageData} */
-    export let data;
 </script>
 
 <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end" background="bg-surface-900 shadow-2xl">

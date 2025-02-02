@@ -29,6 +29,7 @@ func NewAPI(db db.DB) *API {
 
 func (api *API) Run(ctx context.Context, address ...string) error {
 	engine := gin.New()
+	engine.Use(gin.Recovery(), gin.Logger())
 
 	api.controllerV1(engine.Group("/v1"))
 
@@ -38,6 +39,8 @@ func (api *API) Run(ctx context.Context, address ...string) error {
 func (api *API) controllerV1(router *gin.RouterGroup) {
 	router.POST("/register/user", api.registerUser)
 	router.GET("/user/:name", api.getUser)
+	router.GET("/user", api.getUserByState)
+	router.GET("/repos", setHeaderAllowOrigin, userContext, api.getAllRepos)
 	// router.POST("/register/runner", api.registerRunner)
 	// router.POST("/event/branch", api.branchUpdateEvent)
 	// router.POST("/pipeline/webhook", api.webhookPipeline)
@@ -70,4 +73,30 @@ func bindMap(ctx *gin.Context, m map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+// userContext checks if the shawarma_user cookie exists
+func userContext(ctx *gin.Context) {
+	cookie, err := ctx.Cookie("shawarma_user")
+	if err != nil {
+		log.Errorf("failed to find cookie [error=%s]", err.Error())
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	log.Debugf("Cookie Token: %+v", cookie)
+	user, err := service.VerifyJWTToken(cookie)
+	if err != nil {
+		log.Errorf("failed to verify jwt token [error=%s]", err.Error())
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	ctx.Set("user", user)
+}
+
+func setHeaderAllowOrigin(ctx *gin.Context) {
+	ctx.Header("Access-Control-Allow-Origin", "*") // TODO: change this to domain required
+	ctx.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	ctx.Header("Access-Control-Allow-Headers", "Content-Type")
 }

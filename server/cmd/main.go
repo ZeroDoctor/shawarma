@@ -22,7 +22,8 @@ func loadEnv() {
 	}
 	os.Setenv("ENV", env)
 	wd, _ := zdutil.GetExecPath()
-	log.Infof("loading api [env=%s] [commit=%s]...", env, os.Getenv("GIT_COMMIT"))
+	log.WithField("env", env).
+		Infof("loading api [commit=%s]...", os.Getenv("GIT_COMMIT"))
 	godotenv.Load(wd + "/server/" + "." + env + ".env")
 }
 

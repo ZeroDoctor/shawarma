@@ -14,6 +14,8 @@ import (
 var log = logger.Log
 
 type Service struct {
+	LocalCacheMap map[string]string
+
 	db        db.DB
 	userPolls map[string][]*Poll
 }
@@ -22,6 +24,8 @@ func NewService(db db.DB) *Service {
 	remote.Setup(db)
 
 	return &Service{
+		LocalCacheMap: make(map[string]string),
+
 		db:        db,
 		userPolls: make(map[string][]*Poll),
 	}
@@ -36,7 +40,11 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 	}
 	log.Infof("[user=%s] registered with [remote=%s]", user.Name, remoteName)
 
+	// TODO: think about this more...
+	// TODO: should we allow other users to exists
+	// TODO: and only allow them to view owner's orgs if they are a member?
 	if userCount, err := s.db.QueryUserCount(); userCount != 0 || err != nil {
+		log.Debugf("only allowing owner to register [user=%s]", user.Name)
 		return user, err
 	}
 	user.IsOwner = true
@@ -68,6 +76,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 			log.Infof("[user=%s] [orgs=%s] [remote=%s] saved", user.Name, orgs[i].Name, remoteName)
 		}
 
+		log.Infof("[user=%s] saved/updated all orgs [remote=%s]", user.Name, remoteName)
 		return combindErr(errs)
 	})
 	s.userPolls[user.Name] = append(s.userPolls[user.Name], orgPoll)
@@ -93,6 +102,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 			log.Infof("[user=%s] [repos=%s] [remote=%s] saved", user.Name, repos[i].Name, remoteName)
 		}
 
+		log.Infof("[user=%s] saved/updated all repos [remote=%s]", user.Name, remoteName)
 		return combindErr(errs)
 	})
 	s.userPolls[user.Name] = append(s.userPolls[user.Name], repoPoll)
