@@ -11,11 +11,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-viper/mapstructure/v2"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
+	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
 var log *logrus.Logger = logger.Log
@@ -95,24 +98,49 @@ func convertNamedSqlite(object interface{}) map[string]interface{} {
 	return named
 }
 
-func convertModel(objectMap map[string]interface{}, object interface{}) interface{} {
-	if reflect.TypeOf(object).Kind() != reflect.Struct {
-		return object
+func convertModel(objectMap map[string]interface{}, object interface{}) {
+	config := &mapstructure.DecoderConfig{
+		DecodeHook: func() mapstructure.DecodeHookFunc {
+			return func(from reflect.Type, to reflect.Type, data interface{}) (interface{}, error) {
+				if from.Kind() == reflect.String && to == reflect.TypeOf(model.UUID{}) {
+					parsedTime, err := uuid.Parse(data.(string))
+					if err != nil {
+						return nil, err
+					}
+					return model.UUID(parsedTime), nil
+				}
+
+				if from.Kind() == reflect.Map && to.Kind() == reflect.Struct {
+					var fromMap map[string]interface{}
+					var ok bool
+
+					if fromMap, ok = data.(map[string]interface{}); !ok {
+						return data, nil
+					}
+
+					if createdAt, ok := fromMap["created_at"].(int64); ok {
+						fromMap["created_at"] = time.UnixMilli(createdAt)
+					}
+
+					if modifiedAt, ok := fromMap["modified_at"].(int64); ok {
+						fromMap["modified_at"] = time.UnixMilli(modifiedAt)
+					}
+				}
+
+				return data, nil
+			}
+		}(),
+		Result: object,
 	}
 
-	vObject := reflect.ValueOf(object)
-	tObject := vObject.Type()
-
-	for i := 0; i < vObject.NumField(); i++ {
-		tag := tObject.Field(i).Tag.Get("db")
-		value := objectMap[tag]
-
-		switch tag {
-		case "created_at", "modified_at":
-			value = time.Time(value.(Time))
-		}
-		vObject.Field(i).Set(reflect.ValueOf(value))
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		log.Panicf("failed create decoder [error=%s]", err)
+		return
 	}
 
-	return object
+	if err := decoder.Decode(objectMap); err != nil {
+		log.Panicf("failed to decode [error=%s]", err)
+		return
+	}
 }

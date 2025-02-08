@@ -5,6 +5,15 @@
 Currently experimenting with different design and implementation to ensure
 reliability and customizations
 
+## Server Swagger
+
+run server locally via
+
+`make build run`
+
+
+visit swagger in browser [http://localhost:4000/docs](http://localhost:4000/docs)
+
 ## BYO UI/Secret Engine/Runners
 
 Fully customizable and open source CI/CD with [pickle](https://github.com/apple/pkl)! :D

@@ -26,6 +26,6 @@ func (s *SqliteDB) SaveRunner(runner model.Runner) (model.Runner, error) {
 		modified_at = excluded.modified_at
 	;`
 
-	_, err = s.conn.NamedExec(insert, runner)
+	_, err = s.conn.NamedExec(insert, convertNamedSqlite(runner))
 	return runner, err
 }

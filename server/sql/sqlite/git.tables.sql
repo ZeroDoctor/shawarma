@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS repositories (
     owner_id       TEXT,
 
     PRIMARY KEY("owner", "name")
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS branches (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,14 +23,15 @@ CREATE TABLE IF NOT EXISTS branches (
 
     FOREIGN KEY("hash") REFERENCES commits("hash"),
     FOREIGN KEY(repo_id) REFERENCES repositories(uuid)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS commits (
     "hash"     TEXT PRIMARY KEY,
     author     TEXT,
     "message"  TEXT,
     created_at INT
-);
+)
+STRICT;
 
 CREATE TABLE IF NOT EXISTS commit_parents (
     parent_hash TEXT,
@@ -39,5 +40,5 @@ CREATE TABLE IF NOT EXISTS commit_parents (
     UNIQUE(parent_hash, child_hash),
     FOREIGN KEY(parent_hash) REFERENCES commits("hash"),
     FOREIGN KEY(child_hash) REFERENCES commits("hash")
-);
+) STRICT;
 

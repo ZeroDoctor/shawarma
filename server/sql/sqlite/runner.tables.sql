@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS runners (
     modified_at INT,
 
     PRIMARY KEY(hostname, "type")
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS logs (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,4 +17,4 @@ CREATE TABLE IF NOT EXISTS logs (
     runner_id TEXT,
 
     FOREIGN KEY(runner_id) REFERENCES runners(uuid)
-);
+) STRICT;

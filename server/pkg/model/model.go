@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -40,4 +41,19 @@ func (u *UUID) Scan(src interface{}) error {
 
 func (u UUID) Value() (driver.Value, error) {
 	return uuid.UUID(u).String(), nil
+}
+
+type Time time.Time
+
+func (t *Time) Scan(src interface{}) error {
+	if unix, ok := src.(int64); ok {
+		*t = Time(time.Unix(unix, 0))
+		return nil
+	}
+
+	return nil
+}
+
+func (t Time) Value() (driver.Value, error) {
+	return time.Time(t), nil
 }

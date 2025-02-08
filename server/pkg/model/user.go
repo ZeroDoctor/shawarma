@@ -36,7 +36,7 @@ type Organization struct {
 }
 
 type UserPoll struct {
-	ID     UUID   `json:"uuid,omitempty"`
+	UUID   UUID   `json:"uuid,omitempty"`
 	Name   string `json:"name,omitempty"`
 	URL    string `json:"url,omitempty"`
 	Status string `json:"status,omitempty"`

@@ -8,10 +8,21 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
+//	@Summary		Get all repositories
+//	@Description	Retrieve all repositories
+//	@Tags			git
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	[]model.Repository
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/v1/repos [get]
 func (api *API) getAllRepos(ctx *gin.Context) {
-	log.Infof("get all repos")
+	user, exists := ctx.Get("user")
+	if !exists {
+		badRequestError(ctx, ErrUserNotFound)
+	}
 
-	repos, err := api.db.GetAllUserRepos(model.User{})
+	repos, err := api.db.GetAllUserRepos(user.(model.User))
 	if err != nil {
 		log.Errorf("failed to get all repos [error=%s]", err.Error())
 		internalError(ctx, err)

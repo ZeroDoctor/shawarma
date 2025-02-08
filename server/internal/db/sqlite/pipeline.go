@@ -76,7 +76,7 @@ func (s *SqliteDB) SaveStep(step model.Step) (model.Step, error) {
 		pipeline_id = excluded.pipeline_id
 	;`
 
-	if _, err = s.conn.NamedExec(insert, step); err != nil {
+	if _, err = s.conn.NamedExec(insert, convertNamedSqlite(step)); err != nil {
 		return step, err
 	}
 
@@ -111,7 +111,7 @@ func (s *SqliteDB) SaveEvent(event model.Event) (model.Event, error) {
 		step_id     = excluded.step_id
 	;`
 
-	_, err := s.conn.NamedExec(insert, event)
+	_, err := s.conn.NamedExec(insert, convertNamedSqlite(event))
 	return event, err
 }
 
@@ -134,6 +134,6 @@ func (s *SqliteDB) SaveEnvironment(environment model.Environment) (model.Environ
 		org_id      = excluded.org_id
 	;`
 
-	_, err := s.conn.NamedExec(insert, environment)
+	_, err := s.conn.NamedExec(insert, convertNamedSqlite(environment))
 	return environment, err
 }

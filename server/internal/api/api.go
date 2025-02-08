@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mvrilo/go-redoc"
+	ginredoc "github.com/mvrilo/go-redoc/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/internal/logger"
@@ -27,9 +29,31 @@ func NewAPI(db db.DB) *API {
 	}
 }
 
+//go:generate swag init
+
+// @title			Shawarma API
+// @version		1.0
+// @description	Shawarma Server API
+// @host			localhost:4000
+// @BasePath		/
 func (api *API) Run(ctx context.Context, address ...string) error {
+	doc := redoc.Redoc{
+		Title:       "Shawarma API",
+		Description: "Shawarma Server API",
+		SpecFile:    "./server/docs/swagger.yaml",
+		SpecPath:    "/server/docs/swagger.yaml",
+		DocsPath:    "./server/docs",
+	}
+
 	engine := gin.New()
 	engine.Use(gin.Recovery(), gin.Logger())
+	engine.Use(ginredoc.New(doc))
+
+	engine.StaticFile("favicon.ico", "./server/resources/favicon.ico")
+	engine.LoadHTMLGlob("./server/resources/*.html")
+	engine.GET("/docs", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
 
 	api.controllerV1(engine.Group("/v1"))
 
@@ -84,7 +108,6 @@ func userContext(ctx *gin.Context) {
 		return
 	}
 
-	log.Debugf("Cookie Token: %+v", cookie)
 	user, err := service.VerifyJWTToken(cookie)
 	if err != nil {
 		log.Errorf("failed to verify jwt token [error=%s]", err.Error())

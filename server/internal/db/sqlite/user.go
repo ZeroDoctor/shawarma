@@ -30,17 +30,13 @@ func (s *SqliteDB) QueryUserByName(name string) (model.User, error) {
 	}
 	defer rows.Close()
 
-	var userMap map[string]interface{}
+	userMap := make(map[string]interface{})
 	for rows.Next() {
 		if err := rows.MapScan(userMap); err != nil {
 			return user, err
 		}
-	}
 
-	var ok bool
-	user, ok = convertModel(userMap, user).(model.User)
-	if !ok {
-		return user, ErrModelConvert
+		convertModel(userMap, &user)
 	}
 
 	return user, err
@@ -103,7 +99,7 @@ func (s *SqliteDB) SaveOrganization(organization model.Organization) (model.Orga
 		modified_at = excluded.modified_at
 	;`
 
-	if _, err = s.conn.NamedExec(insert, organization); err != nil {
+	if _, err = s.conn.NamedExec(insert, convertNamedSqlite(organization)); err != nil {
 		return organization, err
 	}
 

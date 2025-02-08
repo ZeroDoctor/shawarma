@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     modified_at    INT,
 
     PRIMARY KEY("name")
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS organizations (
     uuid        TEXT UNIQUE, -- yes I know
@@ -21,4 +21,4 @@ CREATE TABLE IF NOT EXISTS organizations (
 
     FOREIGN KEY("owner") REFERENCES users("name"),
     PRIMARY KEY("name")
-);
+) STRICT;

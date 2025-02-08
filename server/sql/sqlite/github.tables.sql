@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS github_users (
     "name"            TEXT UNIQUE NOT NULL,
     created_at        TEXT,
     updated_at        TEXT
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_orgs (
     id                 INT PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS github_orgs (
     updated_at         TEXT,
     archived_at        TEXT,
     "type"             TEXT
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_owners (
     id                INT PRIMARY KEY,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS github_owners (
     organizations_url TEXT,
     repos_url         TEXT,
     "type"            TEXT
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_users_orgs (
     user_id    INT,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS github_users_orgs (
     PRIMARY KEY(user_id, org_id),
     FOREIGN KEY(user_id) REFERENCES github_users(id),
     FOREIGN KEY(org_id) REFERENCES github_orgs(id)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_repos (
     id                INT PRIMARY KEY,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS github_repos (
     default_branch    TEXT,
 
     FOREIGN KEY(owner_id) REFERENCES github_owners(id)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_branches (
     "name"       TEXT,
@@ -89,13 +89,13 @@ CREATE TABLE IF NOT EXISTS github_branches (
     FOREIGN KEY(sha) REFERENCES github_commits(sha),
     FOREIGN KEY(repo_id) REFERENCES github_repos(id),
     PRIMARY KEY(repo_id, "name")
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_commits (
     sha       TEXT PRIMARY KEY,
     "message" TEXT,
     "url"     TEXT
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS github_commit_parents (
     parent_sha TEXT,
@@ -104,4 +104,4 @@ CREATE TABLE IF NOT EXISTS github_commit_parents (
     UNIQUE(parent_sha, child_sha),
     FOREIGN KEY(parent_sha) REFERENCES github_commits(sha),
     FOREIGN KEY(child_sha) REFERENCES github_commits(sha)
-)
+) STRICT;

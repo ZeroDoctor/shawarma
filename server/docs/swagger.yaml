@@ -1,0 +1,280 @@
+basePath: /
+definitions:
+  github_com_zerodoctor_shawarma_pkg_model.Branch:
+    properties:
+      commits:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Commit'
+        type: array
+      created_at:
+        type: string
+      hash:
+        type: string
+      id:
+        type: integer
+      moified_at:
+        type: string
+      name:
+        type: string
+      repo_id:
+        type: string
+    type: object
+  github_com_zerodoctor_shawarma_pkg_model.Commit:
+    properties:
+      author:
+        type: string
+      commit:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Commit'
+        type: array
+      created_at:
+        type: string
+      hash:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_zerodoctor_shawarma_pkg_model.Environment:
+    properties:
+      created_at:
+        type: string
+      data:
+        type: string
+      key:
+        type: string
+      modified_at:
+        type: string
+      org_id:
+        type: string
+      protected:
+        type: boolean
+      repo_id:
+        type: string
+    type: object
+  github_com_zerodoctor_shawarma_pkg_model.Organization:
+    properties:
+      avatar_url:
+        type: string
+      createdAt:
+        type: string
+      env:
+        additionalProperties:
+          type: string
+        type: object
+      environments:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Environment'
+        type: array
+      modifiedAt:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      repository:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Repository'
+        type: array
+      uuid:
+        type: string
+    type: object
+  github_com_zerodoctor_shawarma_pkg_model.Repository:
+    properties:
+      active:
+        $ref: '#/definitions/sql.NullBool'
+      branches:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Branch'
+        type: array
+      created_at:
+        type: string
+      default_branch:
+        type: string
+      env:
+        additionalProperties:
+          type: string
+        type: object
+      environments:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Environment'
+        type: array
+      modified_at:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      owner_id:
+        type: string
+      owner_type:
+        type: string
+      uuid:
+        type: string
+    type: object
+  github_com_zerodoctor_shawarma_pkg_model.User:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      git_remote:
+        items:
+          type: string
+        type: array
+      is_owner:
+        type: boolean
+      modified_at:
+        type: string
+      name:
+        type: string
+      organizations:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Organization'
+        type: array
+      polls:
+        items:
+          type: string
+        type: array
+      repositories:
+        items:
+          $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Repository'
+        type: array
+      session:
+        type: string
+      tokens:
+        additionalProperties:
+          type: string
+        type: object
+      uuid:
+        type: string
+    type: object
+  sql.NullBool:
+    properties:
+      bool:
+        type: boolean
+      valid:
+        description: Valid is true if Bool is not NULL
+        type: boolean
+    type: object
+host: localhost:4000
+info:
+  contact: {}
+  description: Shawarma Server API
+  title: Shawarma API
+  version: "1.0"
+paths:
+  /v1/register/user:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided user details
+      parameters:
+      - description: User details
+        in: body
+        name: data
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - user
+  /v1/repos:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all repositories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.Repository'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all repositories
+      tags:
+      - runner
+  /v1/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by state and remote type
+      parameters:
+      - description: Remote type
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: Remote state
+        in: query
+        name: state
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get user by state
+      tags:
+      - user
+  /v1/user/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by username
+      parameters:
+      - description: Username
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zerodoctor_shawarma_pkg_model.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get user by name
+      tags:
+      - user
+swagger: "2.0"

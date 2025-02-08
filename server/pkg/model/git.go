@@ -1,18 +1,20 @@
 package model
 
 import (
+	"database/sql"
 	"time"
 )
 
 type Repository struct {
-	UUID          UUID      `db:"uuid" json:"uuid,omitempty"`
-	Owner         string    `db:"owner" json:"owner,omitempty"`
-	Name          string    `db:"name" json:"name,omitempty"`
-	DefaultBranch string    `db:"default_branch" json:"default_branch,omitempty"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at,omitempty"`
-	ModifiedAt    time.Time `db:"modified_at" json:"modified_at,omitempty"`
-	OwnerType     string    `db:"owner_type" json:"owner_type,omitempty"`
-	OwnerID       UUID      `db:"owner_id" json:"owner_id,omitempty"`
+	UUID          UUID         `db:"uuid" json:"uuid,omitempty"`
+	Owner         string       `db:"owner" json:"owner,omitempty"`
+	Name          string       `db:"name" json:"name,omitempty"`
+	DefaultBranch string       `db:"default_branch" json:"default_branch,omitempty"`
+	Active        sql.NullBool `db:"active" json:"active,omitempty"`
+	CreatedAt     time.Time    `db:"created_at" json:"created_at,omitempty"`
+	ModifiedAt    time.Time    `db:"modified_at" json:"modified_at,omitempty"`
+	OwnerType     string       `db:"owner_type" json:"owner_type,omitempty"`
+	OwnerID       UUID         `db:"owner_id" json:"owner_id,omitempty"`
 
 	Branches     []Branch      `json:"branches,omitempty"`
 	Environments []Environment `json:"environments,omitempty"`

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS pipelines (
 
     FOREIGN KEY(repo_id) REFERENCES repositories(uuid),
     FOREIGN KEY(runner_id) REFERENCES runners(uuid)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS steps (
     uuid        TEXT UNIQUE,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS steps (
 
     FOREIGN KEY (pipeline_id) REFERENCES pipelines(id),
     PRIMARY KEY("name", pipeline_id)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS environments (
     "key"       TEXT,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS environments (
     FOREIGN KEY (repo_id) REFERENCES repositories(uuid),
     FOREIGN KEY (org_id) REFERENCES organizations(uuid),
     PRIMARY KEY("key", repo_id, org_id)
-);
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS events (
     webhook     TEXT,
@@ -59,4 +59,4 @@ CREATE TABLE IF NOT EXISTS events (
     FOREIGN KEY (pipeline_id) REFERENCES pipelines(id),
     FOREIGN KEY (step_id) REFERENCES steps(uuid),
     PRIMARY KEY ("type", pipeline_id, step_id)
-);
+) STRICT;

@@ -30,7 +30,7 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 		modified_at    = excluded.modified_at
 	;`
 
-	if _, err = s.conn.NamedExec(insert, repository); err != nil {
+	if _, err = s.conn.NamedExec(insert, convertNamedSqlite(repository)); err != nil {
 		return repository, err
 	}
 
@@ -55,8 +55,25 @@ func (s *SqliteDB) SaveRepository(repository model.Repository) (model.Repository
 
 func (s *SqliteDB) GetAllUserRepos(user model.User) ([]model.Repository, error) {
 	var repos []model.Repository
-	query := `SELECT * FROM repositories;`
-	err := s.conn.Select(&repos, query)
+	query := `SELECT * FROM repositories where "owner" = ?;`
+
+	rows, err := s.conn.Queryx(query, user.Name)
+	if err != nil {
+		return repos, err
+	}
+	defer rows.Close()
+
+	repoMap := make(map[string]interface{})
+	for rows.Next() {
+		if err := rows.MapScan(repoMap); err != nil {
+			return repos, err
+		}
+
+		repo := model.Repository{}
+		convertModel(repoMap, &repo)
+		repos = append(repos, repo)
+	}
+
 	return repos, err
 }
 
@@ -69,7 +86,7 @@ func (s *SqliteDB) SaveBranch(branch model.Branch) (model.Branch, error) {
 		:modified_at, :repo_id
 	) RETURNING id;`
 
-	rows, err := s.conn.NamedQuery(insert, branch)
+	rows, err := s.conn.NamedQuery(insert, convertNamedSqlite(branch))
 	if err != nil {
 		return branch, err
 	}
@@ -108,6 +125,6 @@ func (s *SqliteDB) SaveCommit(commit model.Commit) (model.Commit, error) {
 		:hash, :author, :created_at, :branch_id
 	);`
 
-	_, err := s.conn.NamedExec(insert, commit)
+	_, err := s.conn.NamedExec(insert, convertNamedSqlite(commit))
 	return commit, err
 }

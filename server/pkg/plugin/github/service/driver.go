@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/zerodoctor/shawarma/internal/db"
 	"github.com/zerodoctor/shawarma/pkg/model"
@@ -67,10 +68,17 @@ func (gd *GithubDriver) RegisterUserOrganizations(token string, user model.User)
 	}
 	githubUser.Orgs = githubOrgs
 
+	createdAt, err := time.Parse(githubUser.CreatedAt, time.RFC3339)
+	if err != nil {
+		return orgs, fmt.Errorf("failed to parse created at time [error=%w]", err)
+	}
+
 	for i := range githubUser.Orgs {
 		orgs = append(orgs, model.Organization{
-			Name:      githubUser.Orgs[i].Login,
-			AvatarURL: githubUser.Orgs[i].AvatarURL,
+			Name:       githubUser.Orgs[i].Login,
+			AvatarURL:  githubUser.Orgs[i].AvatarURL,
+			CreatedAt:  createdAt,
+			ModifiedAt: time.Now(),
 		})
 	}
 
@@ -102,12 +110,20 @@ func (gd *GithubDriver) RegisterUserRepositories(token string, user model.User) 
 			})
 		}
 
+		createdAt, err := time.Parse(githubUser.Repos[i].CreatedAt, time.RFC3339)
+		if err != nil {
+			return repos, fmt.Errorf("failed to parse created at time [error=%w]", err)
+		}
+
 		repos = append(repos, model.Repository{
 			Name:          githubUser.Repos[i].Name,
 			Owner:         githubUser.Repos[i].Owner.Login,
 			OwnerType:     githubUser.Repos[i].Owner.Type,
 			DefaultBranch: githubUser.Repos[i].DefaultBranch,
 			Branches:      branches,
+			OwnerID:       user.UUID,
+			CreatedAt:     createdAt,
+			ModifiedAt:    time.Now(),
 		})
 	}
 	return repos, nil

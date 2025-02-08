@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/zerodoctor/shawarma/pkg/model"
 	"github.com/zerodoctor/shawarma/pkg/service"
 )
 
@@ -17,8 +18,19 @@ var (
 	ErrInvalidRemoteType   error = errors.New("cannot find 'type' field as string in request")
 	ErrRemoteStateNotFound error = errors.New("cannot find 'state' field in request")
 	ErrInvalidRemoteState  error = errors.New("cannot find 'state' field as string in request")
+	ErrUserNotFound        error = errors.New("user not found")
 )
 
+// @Summary		Register a new user
+// @Description	Register a new user with the provided user details
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Param			data	body		map[string]interface{}	true	"User details"
+// @Success		202		{object}	map[string]interface{}
+// @Failure		400		{object}	map[string]interface{}
+// @Failure		500		{object}	map[string]interface{}
+// @Router			/v1/register/user [post]
 func (api *API) registerUser(ctx *gin.Context) {
 	registerDetails := make(map[string]interface{})
 	if err := bindMap(ctx, registerDetails); err != nil {
@@ -53,6 +65,15 @@ func (api *API) registerUser(ctx *gin.Context) {
 	})
 }
 
+// @Summary		Get user by name
+// @Description	Retrieve user information by username
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Param			name	path		string	true	"Username"
+// @Success		200		{object}	model.User
+// @Failure		500		{object}	map[string]interface{}
+// @Router			/v1/user/{name} [get]
 func (api *API) getUser(ctx *gin.Context) {
 	name := ctx.Param("name")
 
@@ -65,6 +86,16 @@ func (api *API) getUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+// @Summary		Get user by state
+// @Description	Retrieve user information by state and remote type
+// @Tags			user
+// @Accept			json
+// @Produce		json
+// @Param			type	query		string	true	"Remote type"
+// @Param			state	query		string	true	"Remote state"
+// @Success		200		{object}	map[string]interface{}
+// @Failure		404		{object}	map[string]interface{}
+// @Router			/v1/user [get]
 func (api *API) getUserByState(ctx *gin.Context) {
 	remoteType := ctx.Query("type")
 	remoteState := ctx.Query("state")

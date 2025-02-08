@@ -32,13 +32,24 @@ func NewService(db db.DB) *Service {
 }
 
 func (s *Service) RegisterUser(remoteName string, details map[string]interface{}) (model.User, error) {
-	service := remote.GetRemoteService(remoteName)
-	user, err := service.RegisterUser(details)
+	remoteService := remote.GetRemoteService(remoteName)
+	user, err := remoteService.RegisterUser(details)
 	if err != nil {
 		log.Errorf("[user=%s] failed to register with [remote=%s]", user.Name, remoteName)
 		return user, err
 	}
 	log.Infof("[user=%s] registered with [remote=%s]", user.Name, remoteName)
+
+	tmpUser, err := s.db.QueryUserByName(user.Name)
+	if err != nil {
+		log.Errorf("[user=%s] failed to query user [error=%s]", user.Name, err.Error())
+		return user, err
+	}
+
+	if tmpUser.Name == user.Name {
+		log.Debugf("[user=%s] already exists", user.Name)
+		return tmpUser, nil
+	}
 
 	// TODO: think about this more...
 	// TODO: should we allow other users to exists
@@ -58,7 +69,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 	orgPoll := NewPoll(context.Background(), "/orgs", func(ctx context.Context, p *Poll) error {
 		var errs []error
 
-		orgs, err := service.RegisterUserOrganizations(user.Tokens[remoteName], user)
+		orgs, err := remoteService.RegisterUserOrganizations(user.Tokens[remoteName], user)
 		if err != nil {
 			log.Errorf("[user=%s] failed to register orgs [error=%s]", user.Name, err.Error())
 			errs = append(errs, err)
@@ -84,7 +95,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 	repoPoll := NewPoll(context.Background(), "/repos", func(ctx context.Context, p *Poll) error {
 		var errs []error
 
-		repos, err := service.RegisterUserRepositories(user.Tokens[remoteName], user)
+		repos, err := remoteService.RegisterUserRepositories(user.Tokens[remoteName], user)
 		if err != nil {
 			log.Errorf("[user=%s] failed to register repos [error=%s]", user.Name, err.Error())
 			errs = append(errs, err)
@@ -120,7 +131,7 @@ func (s *Service) GetUserPolls(user model.User) []model.UserPoll {
 	ps := s.userPolls[user.Name]
 	for i := range ps {
 		polls = append(polls, model.UserPoll{
-			ID:     model.UUID(ps[i].ID),
+			UUID:   model.UUID(ps[i].ID),
 			Name:   user.Name,
 			URL:    ps[i].URL,
 			Status: ps[i].Status().String(),

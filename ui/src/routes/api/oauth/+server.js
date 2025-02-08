@@ -42,7 +42,7 @@ export async function GET({ url, cookies }) {
 		return new Response('', {
 			status: 307,
 			headers: {
-				location: `/project?state=${data.state}&type=${data.type}&token=true`
+				location: `/projects?state=${data.state}&type=${data.type}&token=true`
 			}
 		});
 	} catch (err) {
