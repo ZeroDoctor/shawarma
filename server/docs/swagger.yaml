@@ -201,7 +201,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve all repositories
+      description: Retrieve all users' repositories
       produces:
       - application/json
       responses:
@@ -218,7 +218,7 @@ paths:
             type: object
       summary: Get all repositories
       tags:
-      - runner
+      - git
   /v1/user:
     get:
       consumes:

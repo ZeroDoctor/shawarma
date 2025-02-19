@@ -1,7 +1,7 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
     import hljs from 'highlight.js/lib/core';
-    import { genericlog } from "$lib/highlight.log";
+    import { genericlog } from "$lib/js/highlight.log";
     import { CodeBlock, storeHighlightJs } from "@skeletonlabs/skeleton";
 
     hljs.registerLanguage('genericlog', genericlog);

@@ -67,7 +67,7 @@ const docTemplate = `{
         },
         "/v1/repos": {
             "get": {
-                "description": "Retrieve all repositories",
+                "description": "Retrieve all users' repositories",
                 "consumes": [
                     "application/json"
                 ],
@@ -75,7 +75,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "runner"
+                    "git"
                 ],
                 "summary": "Get all repositories",
                 "responses": {

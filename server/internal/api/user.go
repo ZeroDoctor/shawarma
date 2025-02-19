@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/zerodoctor/shawarma/pkg/model"
+	"github.com/zerodoctor/shawarma/pkg/model"
 	"github.com/zerodoctor/shawarma/pkg/service"
 )
 
@@ -15,9 +15,7 @@ const JWT_EXPIRATION_TIME = 72 * time.Hour
 
 var (
 	ErrRemoteTypeNotFound  error = errors.New("cannot find 'type' field in request")
-	ErrInvalidRemoteType   error = errors.New("cannot find 'type' field as string in request")
 	ErrRemoteStateNotFound error = errors.New("cannot find 'state' field in request")
-	ErrInvalidRemoteState  error = errors.New("cannot find 'state' field as string in request")
 	ErrUserNotFound        error = errors.New("user not found")
 )
 
@@ -32,19 +30,19 @@ var (
 // @Failure		500		{object}	map[string]interface{}
 // @Router			/v1/register/user [post]
 func (api *API) registerUser(ctx *gin.Context) {
-	registerDetails := make(map[string]interface{})
-	if err := bindMap(ctx, registerDetails); err != nil {
+	details := model.UserGitRegisterDetails{}
+	if err := ctx.BindJSON(&details); err != nil {
 		log.Warnf("failed to bind json to github user [bad_request=%s]", err.Error())
 		badRequestError(ctx, err)
 		return
 	}
 
-	remoteType, remoteState := getRemoteDetails(ctx, registerDetails)
+	remoteType, remoteState := getRemoteDetails(ctx, details)
 	if remoteType == "" || remoteState == "" {
 		return
 	}
 
-	user, err := api.service.RegisterUser(remoteType, registerDetails)
+	user, err := api.service.RegisterUser(remoteType, details)
 	if err != nil {
 		log.Errorf("failed to register user [internal_error=%s]", err.Error())
 		internalError(ctx, err)
@@ -112,34 +110,18 @@ func (api *API) getUserByState(ctx *gin.Context) {
 	})
 }
 
-func getRemoteDetails(ctx *gin.Context, details map[string]interface{}) (string, string) {
-	iRemoteType, ok := details["type"]
-	if !ok {
+func getRemoteDetails(ctx *gin.Context, details model.UserGitRegisterDetails) (string, string) {
+	if details.Type == "" {
 		log.Warnf("failed to register user [bad_request=%s]", ErrRemoteTypeNotFound.Error())
 		badRequestError(ctx, ErrRemoteTypeNotFound)
 		return "", ""
 	}
 
-	remoteType, ok := iRemoteType.(string)
-	if !ok {
-		log.Warnf("failed to register user [bad_request=%s]", ErrInvalidRemoteType.Error())
-		badRequestError(ctx, ErrInvalidRemoteType)
-		return "", ""
-	}
-
-	iRemoteState, ok := details["state"]
-	if !ok {
+	if details.State == "" {
 		log.Warnf("failed to register user [bad_request=%s]", ErrRemoteStateNotFound.Error())
 		badRequestError(ctx, ErrRemoteStateNotFound)
 		return "", ""
 	}
 
-	remoteState, ok := iRemoteState.(string)
-	if !ok {
-		log.Warnf("failed to register user [bad_request=%s]", ErrInvalidRemoteState.Error())
-		badRequestError(ctx, ErrInvalidRemoteState)
-		return "", ""
-	}
-
-	return remoteType, remoteState
+	return details.Type, details.State
 }

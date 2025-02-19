@@ -1,9 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
-export function load({ url }) {
-	console.log(url);
-
+export function load({ }) {
 	let data = {
 		current: 0,
 		projects: [

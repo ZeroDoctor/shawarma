@@ -2,8 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -83,20 +81,6 @@ func badRequestError(ctx *gin.Context, err error) {
 	ctx.JSON(http.StatusBadRequest, gin.H{
 		"error": err.Error(),
 	})
-}
-
-func bindMap(ctx *gin.Context, m map[string]interface{}) error {
-	data, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
-		return err
-	}
-	defer ctx.Request.Body.Close()
-
-	if err := json.Unmarshal(data, &m); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // userContext checks if the shawarma_user cookie exists

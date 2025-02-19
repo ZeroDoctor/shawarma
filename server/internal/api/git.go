@@ -8,14 +8,14 @@ import (
 	"github.com/zerodoctor/shawarma/pkg/model"
 )
 
-//	@Summary		Get all repositories
-//	@Description	Retrieve all repositories
-//	@Tags			git
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	[]model.Repository
-//	@Failure		500	{object}	map[string]interface{}
-//	@Router			/v1/repos [get]
+// @Summary		Get all repositories
+// @Description	Retrieve all users' repositories
+// @Tags			git
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	[]model.Repository
+// @Failure		500	{object}	map[string]interface{}
+// @Router			/v1/repos    [get]
 func (api *API) getAllRepos(ctx *gin.Context) {
 	user, exists := ctx.Get("user")
 	if !exists {
@@ -29,12 +29,15 @@ func (api *API) getAllRepos(ctx *gin.Context) {
 		return
 	}
 
+	log.Infof("found %d repos", len(repos))
 	ctx.JSON(http.StatusOK, repos)
 }
 
 func (api *API) getBranches(ctx *gin.Context) {
 	repoID := ctx.Param(":repoID")
 	log.Infof("get all branches [repoID=%s]", repoID)
+
+	// TODO: check if user has access to repo
 
 	repoUUID, err := uuid.Parse(repoID)
 	if err != nil {
@@ -60,6 +63,8 @@ func (api *API) branchUpdateEvent(ctx *gin.Context) {
 		badRequestError(ctx, err)
 		return
 	}
+
+	// TODO: check if user has access to repo
 
 	if _, err := api.db.SaveBranch(branch); err != nil {
 		log.Errorf("failed to save branch [error=%s]", err.Error())

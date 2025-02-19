@@ -6,6 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type UserGitRegisterDetails struct {
+	Code  string `json:"code,omitempty"`
+	State string `json:"state,omitempty"`
+	Type  string `json:"type,omitempty"`
+}
+
 type User struct {
 	UUID       UUID       `json:"uuid,omitempty" db:"uuid"`
 	Name       string     `json:"name,omitempty" db:"name"`
@@ -20,6 +26,12 @@ type User struct {
 	Repositories  []Repository      `json:"repositories,omitempty"`
 	Polls         []uuid.UUID       `json:"polls,omitempty"`
 	Tokens        map[string]string `json:"tokens,omitempty"`
+}
+
+type UserTokens struct {
+	User   UUID   `json:"user,omitempty" db:"user"`
+	Remote string `json:"remote,omitempty" db:"remote"`
+	Token  string `json:"token,omitempty" db:"token"`
 }
 
 type Organization struct {

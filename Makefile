@@ -24,8 +24,8 @@ build: swag-generate
 	cd server && \
 	go build -o ../shawarma ./cmd/main.go
 
-.PHONY: run
-run:
+.PHONY: server
+server:
 	@echo running server...
 	./shawarma
 

@@ -1,11 +1,6 @@
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
-
-    let endpoint = import.meta.env.VITE_SERVER_ENDPOINT;
-	let reposResponse = await fetch(endpoint+"/v1/repos")
-    console.info(`repos response: ${JSON.stringify(reposResponse)}`);
-
     let data = {
         current: 0,
         projects: [

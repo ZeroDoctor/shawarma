@@ -20,7 +20,7 @@ func (s *SqliteDB) QueryUserCount() (int, error) {
 }
 
 func (s *SqliteDB) QueryUserByName(name string) (model.User, error) {
-	var user model.User
+	user := model.User{Tokens: make(map[string]string)}
 	var err error
 
 	query := `SELECT * FROM users WHERE "name" = ?;`

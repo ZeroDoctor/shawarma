@@ -31,9 +31,17 @@ func NewService(db db.DB) *Service {
 	}
 }
 
-func (s *Service) RegisterUser(remoteName string, details map[string]interface{}) (model.User, error) {
+func (s *Service) RegisterUser(remoteName string, details model.UserGitRegisterDetails) (model.User, error) {
+	user := model.User{Tokens: make(map[string]string)}
+
 	remoteService := remote.GetRemoteService(remoteName)
-	user, err := remoteService.RegisterUser(details)
+	token, err := remoteService.FetchNewToken(details)
+	if err != nil {
+		log.Errorf("failed to fetch new token from [state=%s] [error=%s]", details.State, err.Error())
+		return user, err
+	}
+
+	user, err = remoteService.RegisterUser(token)
 	if err != nil {
 		log.Errorf("[user=%s] failed to register with [remote=%s]", user.Name, remoteName)
 		return user, err
@@ -48,6 +56,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 
 	if tmpUser.Name == user.Name {
 		log.Debugf("[user=%s] already exists", user.Name)
+		tmpUser.Tokens[remoteName] = token
 		return tmpUser, nil
 	}
 
@@ -72,7 +81,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 		orgs, err := remoteService.RegisterUserOrganizations(user.Tokens[remoteName], user)
 		if err != nil {
 			log.Errorf("[user=%s] failed to register orgs [error=%s]", user.Name, err.Error())
-			errs = append(errs, err)
+			errs = append(errs, fmt.Errorf("failed to register orgs for [user=%s] [error=%w]", user.Name, err))
 		}
 
 		for i := range orgs {
@@ -98,7 +107,7 @@ func (s *Service) RegisterUser(remoteName string, details map[string]interface{}
 		repos, err := remoteService.RegisterUserRepositories(user.Tokens[remoteName], user)
 		if err != nil {
 			log.Errorf("[user=%s] failed to register repos [error=%s]", user.Name, err.Error())
-			errs = append(errs, err)
+			errs = append(errs, fmt.Errorf("failed to register repos for [user=%s] [error=%w]", user.Name, err))
 		}
 
 		for i := range repos {

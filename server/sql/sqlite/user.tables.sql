@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS organizations (
     created_at  INT,
     modified_at INT,
 
-    FOREIGN KEY("owner") REFERENCES users("name"),
+    FOREIGN KEY("owner") REFERENCES users(uuid),
     PRIMARY KEY("name")
 ) STRICT;

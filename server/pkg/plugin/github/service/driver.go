@@ -25,20 +25,10 @@ func (gd *GithubDriver) Setup(db db.DB) {
 	gd.db = gdb.NewDB(db.GetType(), db.GetConnection())
 }
 
-func (gd *GithubDriver) RegisterUser(details map[string]interface{}) (model.User, error) {
+func (gd *GithubDriver) RegisterUser(token string) (model.User, error) {
 	var user model.User
 
-	codeInter, ok := details["code"]
-	if !ok {
-		return user, ErrMissingGithubCode
-	}
-
-	code, ok := codeInter.(string)
-	if !ok {
-		return user, ErrFormatGithubCode
-	}
-
-	githubUser, err := gd.SaveGithubAuthUser(code)
+	githubUser, err := gd.SaveGithubAuthUser(token)
 	if err != nil {
 		return user, err
 	}
@@ -68,7 +58,7 @@ func (gd *GithubDriver) RegisterUserOrganizations(token string, user model.User)
 	}
 	githubUser.Orgs = githubOrgs
 
-	createdAt, err := time.Parse(githubUser.CreatedAt, time.RFC3339)
+	createdAt, err := time.Parse(time.RFC3339, githubUser.CreatedAt)
 	if err != nil {
 		return orgs, fmt.Errorf("failed to parse created at time [error=%w]", err)
 	}
@@ -110,7 +100,7 @@ func (gd *GithubDriver) RegisterUserRepositories(token string, user model.User) 
 			})
 		}
 
-		createdAt, err := time.Parse(githubUser.Repos[i].CreatedAt, time.RFC3339)
+		createdAt, err := time.Parse(time.RFC3339, githubUser.Repos[i].CreatedAt)
 		if err != nil {
 			return repos, fmt.Errorf("failed to parse created at time [error=%w]", err)
 		}
@@ -127,6 +117,21 @@ func (gd *GithubDriver) RegisterUserRepositories(token string, user model.User) 
 		})
 	}
 	return repos, nil
+}
+
+func (gd *GithubDriver) FetchNewToken(details model.UserGitRegisterDetails) (string, error) {
+	var token string
+
+	if details.Code == "" {
+		return token, ErrFormatGithubCode
+	}
+
+	token, err := gd.GetGithubToken(details.Code)
+	if err != nil {
+		return token, fmt.Errorf("failed to fetch github token [error=%w]", err)
+	}
+
+	return token, nil
 }
 
 func (gd *GithubDriver) GetCommitsURL(token string, user model.User, hashes []string) ([]model.Commit, error) {

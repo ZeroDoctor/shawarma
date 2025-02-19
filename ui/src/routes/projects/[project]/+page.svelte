@@ -6,9 +6,20 @@
 	import MenuIcon from '$lib/svg/MenuIcon.svelte';
     import { AppBar, Tab, TabGroup } from '@skeletonlabs/skeleton';
     import { Drawer, getDrawerStore, initializeStores } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 
     initializeStores();
     const drawerStore = getDrawerStore();
+
+    /** @type Repository[] */
+    let repositories = [];
+    onMount(async () => {
+        // TODO: handle errors
+        let reposResponse = await fetch("/api/proxy/v1/repos");
+        repositories = await reposResponse.json();
+        console.info(`repos found: ${repositories.length}`);
+    });
+    // TODO: convert repositories to projects
 
     /** @type import("@skeletonlabs/skeleton").DrawerSettings */
     let drawerSettings = {

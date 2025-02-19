@@ -8,9 +8,11 @@ import (
 type GitRemoteDriver interface {
 	Setup(db.DB)
 
-	RegisterUser(map[string]interface{}) (model.User, error)
+	RegisterUser(token string) (model.User, error)
 	RegisterUserOrganizations(string, model.User) ([]model.Organization, error)
 	RegisterUserRepositories(string, model.User) ([]model.Repository, error)
+
+	FetchNewToken(model.UserGitRegisterDetails) (string, error)
 
 	GetCommitsURL(string, model.User, []string) ([]model.Commit, error)
 }

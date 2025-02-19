@@ -30,19 +30,15 @@ type GithubService struct {
 	*GithubRequestLimiter
 }
 
-func (s *GithubService) SaveGithubAuthUser(code string) (gmodel.GithubUser, error) {
+func (s *GithubService) SaveGithubAuthUser(token string) (gmodel.GithubUser, error) {
 	var githubUser gmodel.GithubUser
 
-	token, err := s.GetGithubToken(code)
-	if err != nil {
-		return githubUser, fmt.Errorf("failed to fetch github token [error=%w]", err)
-	}
-
-	githubUser, err = s.GetGithubAuthUser(token)
+	githubUser, err := s.GetGithubAuthUser(token)
 	if err != nil {
 		return githubUser, fmt.Errorf("failed to fetch github user [error=%w]", err)
 	}
 	githubUser.Token = token
+
 	if _, err := s.db.GetGithubUserByName(githubUser.Login); err == nil {
 		return githubUser, nil
 	}

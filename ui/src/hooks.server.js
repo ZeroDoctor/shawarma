@@ -1,5 +1,5 @@
 import * as cookie from 'cookie';
-import { verify_jwt, parse_jwt } from '$lib/jwt';
+import { verify_jwt, parse_jwt } from '$lib/js/jwt';
 import { redirect, error } from '@sveltejs/kit';
 
 /**
@@ -13,12 +13,14 @@ import { redirect, error } from '@sveltejs/kit';
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	console.info(`[handle] hook for page ${event.url.pathname}`);
-  let response = await fetch_token(event);
-  if(response) {
-    return response;
-  }
+	let response = await fetch_token(event);
+	if (response) {
+		return response;
+	}
 
-	const jwt = cookie.parse(event.request.headers.get('cookie') || '')?.shawarma_user || event.cookies.get('shawarma_user');
+	const jwt =
+		cookie.parse(event.request.headers.get('cookie') || '')?.shawarma_user ||
+		event.cookies.get('shawarma_user');
 	if (!jwt) {
 		console.info("[handle] user hasn't logged in");
 		event.cookies.delete('shawarma_user', { path: '/', domain: import.meta.env.VITE_JWT_DOMAIN });
@@ -32,8 +34,8 @@ export async function handle({ event, resolve }) {
 		return create_response(event, resolve);
 	}
 
-	event.locals = parse_jwt(jwt).payload || {verified: false};
-  event.locals.verified = true;
+	event.locals = parse_jwt(jwt).payload || { verified: false };
+	event.locals.verified = true;
 	console.debug(`[handle] user=${event.locals.name} jwt token verified=${event.locals.verified}`);
 
 	return create_response(event, resolve);
@@ -56,9 +58,9 @@ export function handleError({ error, message, status }) {
  * @return {Promise<Response>} The response object with updated headers.
  */
 async function create_response(event, resolve) {
-  if (event.url.pathname !== '/' && event.url.pathname !== '/api/oauth' && !event.locals.verified) {
-    return redirect(307, '/');
-  }
+	if (event.url.pathname !== '/' && event.url.pathname !== '/api/oauth' && !event.locals.verified) {
+		return redirect(307, '/');
+	}
 
 	const response = await resolve(event);
 	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -73,38 +75,50 @@ async function create_response(event, resolve) {
  * @return {Promise<Response|undefined>} The response object with updated headers.
  */
 async function fetch_token(event) {
-  let type = event.url.searchParams.get("type");
-  let state = event.url.searchParams.get("state");
-  let token = event.url.searchParams.get("token");
-  if(type && state && token) {
-		let endpoint = import.meta.env.VITE_SERVER_ENDPOINT;
-    let resp = await event.fetch(endpoint+`/v1/user?type=${type}&state=${state}`, {
-			method: 'GET',
-    })
+	let type = event.url.searchParams.get('type');
+	let state = event.url.searchParams.get('state');
+	let token = event.url.searchParams.get('token');
+	if (!type || !state || !token) {
+		return;
+	}
 
-		if (!resp || !resp.ok) {
-			console.error('[fetch] failed to register github user', resp);
-		}
+	console.info(`[fetch_token] fetching token for type=${type} state=${state}`);
+	let endpoint = import.meta.env.VITE_SERVER_ENDPOINT;
+	let resp = await event.fetch(endpoint + `/v1/user?type=${type}&state=${state}`, {
+		method: 'GET'
+	});
 
-		let errorMsg = '';
-		switch (resp.status) {
-      case 401:
-			case 404:
-				errorMsg = 'Unauthorized';
-				event.cookies.delete('shawarma_user', { path: '/', domain: import.meta.env.VITE_JWT_DOMAIN });
-				return redirect(307, '/');
-			case 403:
-				errorMsg = 'Forbidden';
-				event.cookies.delete('shawarma_user', { path: '/', domain: import.meta.env.VITE_JWT_DOMAIN });
-				return error(resp.status, errorMsg);
-		}
+	if (!resp || !resp.ok) {
+		console.error('[fetch] failed to register github user', resp);
+	}
 
-		if (resp.status !== 202) {
-			return error(500, 'Something went wrong');
-		}
+	let errorMsg = '';
+	switch (resp.status) {
+		case 401:
+		case 404:
+			errorMsg = 'Unauthorized';
+			event.cookies.delete('shawarma_user', {
+				path: '/',
+				domain: import.meta.env.VITE_JWT_DOMAIN
+			});
+			return redirect(307, '/');
+		case 403:
+			errorMsg = 'Forbidden';
+			event.cookies.delete('shawarma_user', {
+				path: '/',
+				domain: import.meta.env.VITE_JWT_DOMAIN
+			});
+			return error(resp.status, errorMsg);
+	}
 
-    let user = await resp.json();
-    console.info(`[fetch_token] fetched token=${user.token}`);
-    event.cookies.set('shawarma_user', user.token, { path: '/', domain: import.meta.env.VITE_JWT_DOMAIN });
-  }
+	if (resp.status !== 202) {
+		return error(500, 'Something went wrong');
+	}
+
+	let user = await resp.json();
+	console.info(`[fetch_token] fetched token=${user.token}`);
+	event.cookies.set('shawarma_user', user.token, {
+		path: '/',
+		domain: import.meta.env.VITE_JWT_DOMAIN
+	});
 }

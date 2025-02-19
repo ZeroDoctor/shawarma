@@ -1,4 +1,4 @@
-import { uuidv4 } from '$lib/random';
+import { uuidv4 } from '$lib/js/random';
 import { error, redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').RequestHandler} */

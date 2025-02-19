@@ -3,9 +3,16 @@
 	import MenuIcon from '$lib/svg/MenuIcon.svelte';
     import { AppBar } from '@skeletonlabs/skeleton';
     import { Drawer, getDrawerStore, initializeStores } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 
     initializeStores();
     const drawerStore = getDrawerStore();
+
+    onMount(async () => {
+        let reposResponse = await fetch("/api/proxy/v1/repos");
+        let repos = await reposResponse.json();
+        console.info(`repos found: ${repos.length}`);
+    });
 
     /** @type import("@skeletonlabs/skeleton").DrawerSettings */
     let drawerSettings = {
