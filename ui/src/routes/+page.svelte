@@ -1,5 +1,5 @@
 <script>
-	import { uuidv4 } from '$lib/random.js';
+	import { uuidv4 } from '$lib/js/random.js';
 
     /** @type {import('./$types').PageData} */
     export let data;
@@ -9,7 +9,7 @@
         url.searchParams.set('client_id', data.clientID);
         url.searchParams.set('redirect_uri', "http://localhost:3000/api/oauth?type=github");
         url.searchParams.set('state', uuidv4());
-        url.searchParams.set('scope', "read:user read:org");
+        url.searchParams.set('scope', "read:user read:org repo");
 
         // @ts-ignore
         window.location.assign(url.toString());
